@@ -1,0 +1,42 @@
+body {
+    text-align: center;
+}
+
+#header button:not(:first-child), #header input {
+    margin-left: .5em;
+}
+
+#root {
+    display: flex;
+    justify-content: space-evenly;
+    width: 1000px;
+    left: 50%;
+    position: relative;
+    margin-left: -500px;
+}
+
+#root form {
+    margin-top: 1em;
+    width: 350px;
+}
+
+#root textarea {
+    display: block;
+    resize: none;
+    width: 350px;
+    height: 95%;
+}
+
+#root form label {
+    color: black;
+    display: block;
+    font-size: smaller;
+    font-weight: bold;
+    text-align: left;
+    margin-left: 1em;
+}
+
+#root form input {
+    display: block;
+    margin-bottom: .5em;
+}
