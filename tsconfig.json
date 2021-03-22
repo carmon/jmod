@@ -10,7 +10,8 @@
     "paths": {
       "https://unpkg.com/browser-nativefs": ["./node_modules/browser-nativefs/index.d.ts"]
     },
-    "sourceMap": true
+    "sourceMap": true,
+    "inlineSources": true
   },
   "include": ["src/**/*", "index.ts"],
   "exclude": ["node_modules"]
