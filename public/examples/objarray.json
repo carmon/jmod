@@ -1,0 +1,16 @@
+{
+  "dev": {
+    "objArray": [
+      {
+        "a": "hola",
+        "before": 1,
+        "mindfuck": [
+          6,
+          7,
+          8,
+          0
+        ]
+      }
+    ]
+  }
+}

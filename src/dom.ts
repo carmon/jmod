@@ -78,10 +78,10 @@ interface DropdownProps {
 
 export const createDropdown = ({ onChange, options }: DropdownProps): HTMLSelectElement => {
   const sel = document.createElement('select');
-  [ "--Select and option", ...options].forEach(o => {
+  options.forEach(o => {
     const opt = document.createElement('option');
     opt.textContent = o;
-    opt.value = o; 
+    opt.value = o;
     sel.appendChild(opt);
   });
   sel.onchange = onChange;
