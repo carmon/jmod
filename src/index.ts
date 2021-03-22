@@ -8,9 +8,9 @@ import {
   createTextArea, 
   createTitle
 } from './dom.js';
-import { resolveExample } from './window.js';
+import { getSearchWord } from './window.js';
 import { openFileLoader, saveToJSON } from './nativefs.js';
-import { deepMerge } from './utils.js';
+import { deepMerge, loadExample } from './utils.js';
 
 interface EventWrapper extends Event {
   currentTarget: HTMLInputElement;
@@ -97,12 +97,17 @@ const addAttributesToForm = (obj: any, parent: HTMLElement) => (rootKey: string)
           const id = `${rootKey}-${value.length}`;
           const type = typeof value[0];
           if (type === 'object') {
-
+            if (Array.isArray(value[0])) {
+              // TO DO
+            }
+            Object.keys(value[0]).forEach(k => addAttributesToForm(value[0], label)(`${id}-${k}`));
+            value.push(value[0]);
+          } else {
+            const defaultValue = type === 'number' ? 0 : '';
+            addAttributesToForm(value, label)(id);
+            value.push(defaultValue);
           }
-          const defaultValue = type === 'number' ? 0 : '';
-          addAttributesToForm(value, label)(id);
           label.appendChild(btn);
-          value.push(defaultValue);
 
           preview.value = JSON.stringify(jsonObj, null, 2);
         },
@@ -133,12 +138,10 @@ if (window.isSecureContext) {
     
     // Remove old form & path if present
     if (document.forms[0]) left.removeChild(document.forms[0]);
-    const previewEl = document.getElementById('Preview');
-    if (previewEl) right.removeChild(previewEl);
+    if (preview) right.removeChild(preview);
     
     const { fileName, json } = await openFileLoader();
   
-    // Save to target filename
     pathInput.value = fileName;
   
     button.disabled = false;
@@ -198,27 +201,29 @@ if (window.isSecureContext) {
         input.oninput = onInputChange;
       else 
         input.onchange = onInputChange;
-
-      console.log(typeof input.value);
       
       input.type = getInputType(value);
 
       if (value === 'boolean') input.checked = false;
       if (value === 'number') input.value = '0';
       if (value === 'string') input.value = '';
-
       if (value === 'array') {
         // TO DO
       }
 
       onInputChange({ currentTarget: input } as EventWrapper);
+      input.focus();
     },
     options: dropdownOptions
   });
 
-  resolveExample().then(example => {
+  const w = getSearchWord();
+  const filename =  w ? `${w}.json` : 'recursion.json';
+  pathInput.value = filename;
+  
+  loadExample(filename).then(example => {
     jsonObj = JSON.parse(example);
-      
+          
     const form = createForm();
     Object.keys(jsonObj)
       .forEach(addAttributesToForm(jsonObj, form));

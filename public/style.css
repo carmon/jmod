@@ -15,16 +15,16 @@ body {
     margin-left: -500px;
 }
 
-#root form {
-    margin-top: 1em;
-    width: 350px;
-}
-
 #root textarea {
     display: block;
     resize: none;
     width: 350px;
     height: 95%;
+}
+
+#root form {
+    margin-top: 1em;
+    width: 350px;
 }
 
 #root form label {
@@ -36,7 +36,9 @@ body {
     margin-left: 1em;
 }
 
-#root form input {
+#root form input, 
+#root form button,
+#root form select {
     display: block;
     margin-bottom: .5em;
 }

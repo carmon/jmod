@@ -16,3 +16,14 @@ export const deepMerge = (source: Object, target: Object): Object => {
 
   return result;
 }
+
+const EXAMPLES_ROOT = './examples';
+
+export const loadExample = async (filename: string): Promise<string> => {
+  const res = await fetch(`${EXAMPLES_ROOT}/${filename}`, { method: 'GET' });
+  if (res.status < 400) 
+      return await res.text();
+
+  const recursion = await fetch(`${EXAMPLES_ROOT}/recursion.json`, { method: 'GET' });
+  return await recursion.text();
+};
