@@ -10,18 +10,11 @@ import {
 } from './dom.js';
 import { getSearchWord } from './window.js';
 import { openFileLoader, saveToJSON } from './nativefs.js';
-import { deepMerge, loadExample } from './utils.js';
+import { deepMerge, loadExample, shallowClone } from './utils.js';
 
-interface EventWrapper extends Event {
-  currentTarget: HTMLInputElement;
-}
-
-const onInputChange = (e: EventWrapper) => {
-  const getTypeCast = (type: string, value: string) => 
-    type === 'number' ? Number(value) : value;
-  
-  const { id, value, type, checked } = e.currentTarget;
-  const targetValue = type === 'checkbox' ? checked : getTypeCast(type, value);
+const handleInputChange = (input: HTMLInputElement) => {  
+  const { id, value, type, checked } = input;
+  const targetValue = type === 'checkbox' ? checked : type === 'number' ? Number(value) : value;
   if (id.includes('-')) {
     const keys = id.split('-');
     const parentValue = keys
@@ -31,7 +24,7 @@ const onInputChange = (e: EventWrapper) => {
         jsonObj
       );
 
-    let modified = {};
+    let modified = {};  
     if (Array.isArray(parentValue)) {
       const i = Number(keys.pop()); // Remove last key because it's an index
       parentValue.splice(i, 1, targetValue); // Mutate original value
@@ -53,7 +46,6 @@ const onInputChange = (e: EventWrapper) => {
 
   preview.value = JSON.stringify(jsonObj, null, 2);
 };
-
 const dropdownOptions = ['string', 'number', 'boolean', 'array'];
 
 const onInputFocused = (e: Event) => {
@@ -61,24 +53,24 @@ const onInputFocused = (e: Event) => {
   currentInput.parentElement.appendChild(dropdown);
   dropdown.selectedIndex = dropdownOptions.indexOf(getValueType(currentInput.type));
 }
-
 const getValueType = (t: string) =>
   t === 'checkbox' ? 'boolean' : t === 'text' ? 'string' : 'number';
 
 const getInputType = (t: string) => 
   t === 'boolean' ? 'checkbox' : t === 'string' ? 'text' : 'number';
 
-const addAttributesToForm = (obj: any, parent: HTMLElement) => (rootKey: string) => {
+const addAttributeToForm = (rootKey: string, value: any, parent: HTMLElement) => {
   const key = rootKey.includes('-') 
     ? rootKey.split('-')[rootKey.split('-').length - 1]
     : rootKey;
+  
   const label = createLabel({ key });
   const addInputToLabel = (value: any, id: string) => {
     const isNull = value === null; 
     const type = isNull ? 'string' : typeof(value);
     const input = createInput({
       id, 
-      onChange: isNull ? undefined : onInputChange,
+      onChange: isNull ? undefined : (e) => handleInputChange(e.currentTarget as HTMLInputElement),
       onFocus: onInputFocused,
       type: getInputType(type), 
       value: isNull ? 'Value is null' : value,
@@ -86,11 +78,10 @@ const addAttributesToForm = (obj: any, parent: HTMLElement) => (rootKey: string)
     label.appendChild(input);
   };
   
-  const value = obj[key];
   if (typeof(value) === 'object') {
     if (Array.isArray(value)) {
       value.forEach((v: any, i: number) => 
-        addAttributesToForm(value, label)(`${rootKey}-${i}`));
+        addAttributeToForm(`${rootKey}-${i}`, v, label));
       const btn = createButton({
         onclick: (e) => {
           e.preventDefault();
@@ -100,11 +91,12 @@ const addAttributesToForm = (obj: any, parent: HTMLElement) => (rootKey: string)
             if (Array.isArray(value[0])) {
               // TO DO
             }
-            Object.keys(value[0]).forEach(k => addAttributesToForm(value[0], label)(`${id}-${k}`));
-            value.push(value[0]);
+            const clone = shallowClone(value[0]);
+            Object.keys(clone).forEach(k => addAttributeToForm(`${id}-${k}`, (<any>clone)[k], label));
+            value.push(clone);
           } else {
             const defaultValue = type === 'number' ? 0 : '';
-            addAttributesToForm(value, label)(id);
+            addAttributeToForm(id, value, label);
             value.push(defaultValue);
           }
           label.appendChild(btn);
@@ -117,17 +109,24 @@ const addAttributesToForm = (obj: any, parent: HTMLElement) => (rootKey: string)
     } else if (value === null)
       addInputToLabel(value, rootKey);
     else
-      Object.keys(value).forEach(k => addAttributesToForm(value, label)(`${rootKey}-${k}`));
+      Object.keys(value).forEach(k => addAttributeToForm(`${rootKey}-${k}`, value[k], label));
   } else {
     addInputToLabel(value, rootKey);
   }
+
   parent.appendChild(label);
 };
 
+let form: HTMLFormElement | null = null;
 let preview: HTMLTextAreaElement | null = null;
 let jsonObj: { [key: string]: any } = null;
 let dropdown: HTMLSelectElement | null = null;
 let currentInput: HTMLInputElement | null = null;
+
+const fillForm = (obj: Object) => {
+  Object.keys(obj)
+    .forEach(k => addAttributeToForm(k, (<any>obj)[k], form));
+}
 
 if (window.isSecureContext) {
   // Header
@@ -137,9 +136,15 @@ if (window.isSecureContext) {
     button.textContent = 'Loading...';
     
     // Remove old form & path if present
-    if (document.forms[0]) left.removeChild(document.forms[0]);
-    if (preview) right.removeChild(preview);
-    
+    if (form)  {
+      left.removeChild(form);
+      form = null;
+    }
+    if (preview) {
+      right.removeChild(preview);
+      preview = null;
+    }
+
     const { fileName, json } = await openFileLoader();
   
     pathInput.value = fileName;
@@ -149,9 +154,8 @@ if (window.isSecureContext) {
   
     jsonObj = JSON.parse(json);
   
-    const form = createForm();
-    Object.keys(jsonObj)
-      .forEach(addAttributesToForm(jsonObj, form));
+    form = createForm();
+    fillForm(jsonObj);
     left.appendChild(form); 
   
     preview = createTextArea({ content: json, id: 'Preview'});
@@ -198,9 +202,9 @@ if (window.isSecureContext) {
       const input = currentInput;
       
       if (value === 'string') 
-        input.oninput = onInputChange;
+        input.oninput = () => handleInputChange(input);
       else 
-        input.onchange = onInputChange;
+        input.onchange = () => handleInputChange(input);
       
       input.type = getInputType(value);
 
@@ -211,7 +215,7 @@ if (window.isSecureContext) {
         // TO DO
       }
 
-      onInputChange({ currentTarget: input } as EventWrapper);
+      handleInputChange(input);
       input.focus();
     },
     options: dropdownOptions
@@ -224,9 +228,8 @@ if (window.isSecureContext) {
   loadExample(filename).then(example => {
     jsonObj = JSON.parse(example);
           
-    const form = createForm();
-    Object.keys(jsonObj)
-      .forEach(addAttributesToForm(jsonObj, form));
+    form = createForm();
+    fillForm(jsonObj);
     left.appendChild(form);
     
     preview = createTextArea({ content: example, id: 'Preview'});
