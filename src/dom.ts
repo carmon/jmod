@@ -1,12 +1,10 @@
 // DOM utility, has direct access to document global object
-
-// Begin core
 interface ButtonProps {
   onclick?: (ev: MouseEvent) => void;
   text: string;
 }
 
-export const createButton = ({ onclick, text }: ButtonProps) => {
+export const createButton = ({ onclick, text }: ButtonProps): HTMLButtonElement => {
   const button = document.createElement('button');
   button.onclick = onclick;
   button.textContent = text;
@@ -18,14 +16,14 @@ interface LabelProps {
   text?: string;
 }
 
-export const createLabel = ({ key }: LabelProps) => {
+export const createLabel = ({ key }: LabelProps): HTMLLabelElement => {
   const label = document.createElement('label');
   label.htmlFor = key;
   label.textContent = key;
   return label;
 };
 
-export const createForm = () => document.createElement('form');
+export const createForm = (): HTMLFormElement => document.createElement('form');
 
 interface InputProps {
   disabled?: boolean;
@@ -34,9 +32,9 @@ interface InputProps {
   onFocus?: (e: Event) => void; 
   type: 'text' | 'number' | 'checkbox';
   value: boolean | string;
-};
+}
 
-export const createInput = ({ disabled, id, onChange, onFocus, type, value }: InputProps) => {
+export const createInput = ({ disabled, id, onChange, onFocus, type, value }: InputProps): HTMLInputElement => {
   const input = document.createElement('input');
   input.disabled = !!disabled;
   input.id = id;
@@ -68,9 +66,6 @@ export const createTextArea = ({ content, id }: TextAreaProps): HTMLTextAreaElem
   textArea.readOnly = true;
   return textArea;
 }
-// End core
-
-// Begin type switcher
 interface DropdownProps {
   onChange: (e: Event) => void;
   options: string[];
@@ -87,21 +82,3 @@ export const createDropdown = ({ onChange, options }: DropdownProps): HTMLSelect
   sel.onchange = onChange;
   return sel;
 };
-// End type switcher
-
-// Begin graphic utilities
-export const createDiv = (): HTMLDivElement => {
-  const div = document.createElement('div');
-  return div;
-}
-
-interface TitleProps {
-  text: string;
-}
-
-export const createTitle = ({ text }: TitleProps): HTMLDivElement => {
-  const h3 = document.createElement('h3');
-  h3.textContent = text;
-  return h3;
-}
-// End graphic utilities

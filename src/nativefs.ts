@@ -1,4 +1,4 @@
-import { fileOpen , fileSave } from 'https://unpkg.com/browser-nativefs';
+import { fileOpen , fileSave, FileSystemHandle } from 'https://unpkg.com/browser-nativefs';
 
 interface LoadResult {
   fileName: string;
@@ -7,16 +7,16 @@ interface LoadResult {
   
 export const openFileLoader = async (): Promise<LoadResult> => {
   const file = await fileOpen({
-      mimeTypes: ['application/json'],
-      extensions: ['.json'],
-      description: 'any JSON file',
+    mimeTypes: ['application/json'],
+    extensions: ['.json'],
+    description: 'any JSON file',
   });
   
   const json = await file.text();
   return { fileName: file.name, json };
 };
 
-export const saveToJSON = async (textContent: string, fileName: string) => {
+export const saveToJSON = async (textContent: string, fileName: string): Promise<FileSystemHandle> => {
   const blob = new Blob([textContent], {type : 'application/json'});
-  await fileSave(blob, { fileName, extensions: ['.json'] });
+  return await fileSave(blob, { fileName, extensions: ['.json'] });
 }
