@@ -4,8 +4,8 @@ import {
 import { getSearchWord } from './window.js';
 import { saveToJSON } from './nativefs.js';
 
-import createFileInput from './components/file-input.js';
-import createForm from './components/form.js';
+import createFileInput from './file-input.js';
+import createForm from './core/form.js';
 
 import loadExample from './load.js';
 
@@ -32,6 +32,16 @@ if (window.isSecureContext) {
     });
     formParent.appendChild(form);
   };
+
+  const clean = () => {
+    console.log('clean');
+
+    previewParent.removeChild(preview);
+    preview = null;
+    
+    formParent.removeChild(form);
+    form = null;
+  };
   
   const w = getSearchWord();
   let filename =  w ? `${w}.json` : 'recursion.json';
@@ -47,15 +57,7 @@ if (window.isSecureContext) {
   createFileInput({
     parent: document.getElementById("file-input"),
     start,
-    clean: () => {
-      console.log('clean');
-  
-      previewParent.removeChild(preview);
-      preview = null;
-      
-      formParent.removeChild(form);
-      form = null;
-    },
+    clean,
     onChangeFilepath,
     onSaveJSONClick
   });

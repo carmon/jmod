@@ -1,9 +1,9 @@
 import { 
   createButton,
   createInput,
-} from '../dom.js';
+} from './dom.js';
 
-import { openFileLoader } from '../nativefs.js';
+import { openFileLoader } from './nativefs.js';
 
 interface FileInputProps {
     parent:  HTMLElement;
@@ -23,7 +23,7 @@ export default ({
   const onOpenJSONClick = async () => {
     openBtn.disabled = true;
     openBtn.textContent = 'Loading...';
-        
+    
     clean();
 
     const { fileName, json } = await openFileLoader();

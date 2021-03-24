@@ -1,6 +1,4 @@
 // DOM utility, has direct access to document global object
-
-// Begin core
 interface ButtonProps {
   onclick?: (ev: MouseEvent) => void;
   text: string;
@@ -68,9 +66,6 @@ export const createTextArea = ({ content, id }: TextAreaProps): HTMLTextAreaElem
   textArea.readOnly = true;
   return textArea;
 }
-// End core
-
-// Begin type switcher
 interface DropdownProps {
   onChange: (e: Event) => void;
   options: string[];
@@ -87,4 +82,3 @@ export const createDropdown = ({ onChange, options }: DropdownProps): HTMLSelect
   sel.onchange = onChange;
   return sel;
 };
-// End type switcher

@@ -98,7 +98,6 @@ export default ({
             const id = `${rootKey}-${value.length}`;
             const last = value[value.length - 1];
             const type = typeof last;
-            console.log(last, type);
             if (type === 'object') {
               if (Array.isArray(last)) {
                 // TO DO

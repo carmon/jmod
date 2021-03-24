@@ -2,7 +2,8 @@ body {
     text-align: center;
 }
 
-#header button:not(:first-child), #header input {
+#file-input button:not(:first-child), 
+#file-input input {
     margin-left: .5em;
 }
 
