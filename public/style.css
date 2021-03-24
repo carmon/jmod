@@ -7,7 +7,7 @@ body {
     margin-left: .5em;
 }
 
-#core {
+.core {
     display: flex;
     justify-content: space-evenly;
     width: 1000px;
@@ -16,19 +16,19 @@ body {
     margin-left: -500px;
 }
 
-#core textarea {
+.core textarea {
     display: block;
     resize: none;
     width: 350px;
     height: 95%;
 }
 
-#core form {
+.core form {
     margin-top: 1em;
     width: 350px;
 }
 
-#core form label {
+.core form label {
     color: black;
     display: block;
     font-size: smaller;
@@ -37,9 +37,9 @@ body {
     margin-left: 1em;
 }
 
-#core form input, 
-#core form button,
-#core form select {
+.core form input, 
+.core form button,
+.core form select {
     display: block;
     margin-bottom: .5em;
 }
