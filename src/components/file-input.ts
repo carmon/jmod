@@ -6,7 +6,7 @@ import {
 import { openFileLoader } from '../nativefs.js';
 
 interface FileInputProps {
-    parent: HTMLElement;
+    parent:  HTMLElement;
     start: (json: string) => void;
     clean: () => void;
     onChangeFilepath: (ev: InputEvent) => void;

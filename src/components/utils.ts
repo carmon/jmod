@@ -1,3 +1,9 @@
+/**
+ * Merges two objects, target arrays prevail
+ * @param source source object
+ * @param target target object, arrays first
+ * @returns merged object
+ */
 export const deepMerge = (source: Record<string, unknown>, target: Record<string, unknown>): Record<string, unknown> => {
   const result = { ...source,...target };
   const keys = Object.keys(result);
@@ -17,16 +23,17 @@ export const deepMerge = (source: Record<string, unknown>, target: Record<string
   return result;
 }
 
-type AttributeType = 'string' | 'number' | 'boolean';
+export type AttributeType = 'string' | 'number' | 'boolean';
 
 export const getDefaultValue = (type: AttributeType): string | number | boolean =>
   type === "boolean" ? false : type === "string" ? '' : 0;   
 
 /**
  * Clones an object to a new object with default values
- * @param source Object to clone
+ * @param source object to clone
+ * @returns cloned object
  */
-export const shallowClone = (source: Record<string, unknown>): Record<string, unknown> =>
+export const cloneToDefault = (source: Record<string, unknown>): Record<string, unknown> =>
   Object.keys(source).reduce((prev, curr) => {
     const value = source[curr];
     const type = typeof value;
@@ -42,24 +49,9 @@ export const shallowClone = (source: Record<string, unknown>): Record<string, un
         else if (value === null)
           return null;
         
-        return shallowClone(value as Record<string, unknown>);
+        return cloneToDefault(value as Record<string, unknown>);
       }
       return getDefaultValue(t as AttributeType);
     }
     return { ...prev, [curr]: resolveType(type as ValidType)};
   }, {});
-
-/// Async examples load
-
-const EXAMPLES_ROOT = './examples';
-
-export const loadExample = async (filename: string): Promise<string> => {
-  const opts = { method: 'GET' };
-  const res = await fetch(`${EXAMPLES_ROOT}/${filename}`, opts);
-  if (!res.ok) {
-    const recursion = await fetch(`${EXAMPLES_ROOT}/recursion.json`, opts);
-    return await recursion.text();
-  }
-    
-  return await res.text();
-};
