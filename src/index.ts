@@ -1,16 +1,16 @@
 import { 
-  createButton, 
-  createDiv, 
+  createButton,
   createDropdown,
   createForm,
   createInput,
   createLabel,
-  createTextArea, 
-  createTitle
+  createTextArea,
 } from './dom.js';
 import { getSearchWord } from './window.js';
-import { openFileLoader, saveToJSON } from './nativefs.js';
+import { saveToJSON } from './nativefs.js';
 import { deepMerge, loadExample, shallowClone } from './utils.js';
+
+import createFileInput from './components/file-input.js';
 
 const handleInputChange = (input: HTMLInputElement) => {  
   const { id, value, type, checked } = input;
@@ -29,24 +29,22 @@ const handleInputChange = (input: HTMLInputElement) => {
       const i = Number(keys.pop()); // Remove last key because it's an index
       parentValue.splice(i, 1, targetValue); // Mutate original value
       modified = keys.reduceRight(
-        (prev, curr): Object => ({ [curr]: prev }),
+        (prev, curr): unknown => ({ [curr]: prev }),
         parentValue
       );
     } else {
       modified = keys.reduceRight(
-        (prev, curr): Object => ({ [curr]: prev }),
+        (prev, curr): unknown => ({ [curr]: prev }),
         targetValue
       );
     }
-
     jsonObj = deepMerge(jsonObj, modified);
   } else {
     jsonObj[id] = targetValue;
   }
-
   preview.value = JSON.stringify(jsonObj, null, 2);
 };
-const dropdownOptions = ['string', 'number', 'boolean', 'array'];
+const dropdownOptions = ['string', 'number', 'boolean'];
 
 const onInputFocused = (e: Event) => {
   currentInput = e.currentTarget as HTMLInputElement;
@@ -59,13 +57,13 @@ const getValueType = (t: string) =>
 const getInputType = (t: string) => 
   t === 'boolean' ? 'checkbox' : t === 'string' ? 'text' : 'number';
 
-const addAttributeToForm = (rootKey: string, value: any, parent: HTMLElement) => {
+const addAttributeToForm = (rootKey: string, value: unknown, parent: HTMLElement) => {
   const key = rootKey.includes('-') 
     ? rootKey.split('-')[rootKey.split('-').length - 1]
     : rootKey;
   
   const label = createLabel({ key });
-  const addInputToLabel = (value: any, id: string) => {
+  const addInputToLabel = (value: string | boolean | null, id: string) => {
     const isNull = value === null; 
     const type = isNull ? 'string' : typeof(value);
     const input = createInput({
@@ -80,7 +78,7 @@ const addAttributeToForm = (rootKey: string, value: any, parent: HTMLElement) =>
   
   if (typeof(value) === 'object') {
     if (Array.isArray(value)) {
-      value.forEach((v: any, i: number) => 
+      value.forEach((v: unknown, i: number) => 
         addAttributeToForm(`${rootKey}-${i}`, v, label));
       const btn = createButton({
         onclick: (e) => {
@@ -92,7 +90,7 @@ const addAttributeToForm = (rootKey: string, value: any, parent: HTMLElement) =>
               // TO DO
             }
             const clone = shallowClone(value[0]);
-            Object.keys(clone).forEach(k => addAttributeToForm(`${id}-${k}`, (<any>clone)[k], label));
+            Object.keys(clone).forEach(k => addAttributeToForm(`${id}-${k}`, (<Record<string, unknown>>clone)[k], label));
             value.push(clone);
           } else {
             const defaultValue = type === 'number' ? 0 : '';
@@ -107,11 +105,13 @@ const addAttributeToForm = (rootKey: string, value: any, parent: HTMLElement) =>
       });
       label.appendChild(btn);
     } else if (value === null)
-      addInputToLabel(value, rootKey);
-    else
-      Object.keys(value).forEach(k => addAttributeToForm(`${rootKey}-${k}`, value[k], label));
+      addInputToLabel(value as null, rootKey);
+    else {
+      Object.keys(value)
+        .forEach(k => addAttributeToForm(`${rootKey}-${k}`, (<Record<string, unknown>>value)[k], label));
+    }
   } else {
-    addInputToLabel(value, rootKey);
+    addInputToLabel(value as string, rootKey);
   }
 
   parent.appendChild(label);
@@ -119,83 +119,59 @@ const addAttributeToForm = (rootKey: string, value: any, parent: HTMLElement) =>
 
 let form: HTMLFormElement | null = null;
 let preview: HTMLTextAreaElement | null = null;
-let jsonObj: { [key: string]: any } = null;
+let jsonObj: { [key: string]: unknown } = null;
 let dropdown: HTMLSelectElement | null = null;
 let currentInput: HTMLInputElement | null = null;
 
-const fillForm = (obj: Object) => {
+const fillForm = (obj: Record<string, unknown>) => {
   Object.keys(obj)
-    .forEach(k => addAttributeToForm(k, (<any>obj)[k], form));
+    .forEach(k => addAttributeToForm(k, obj[k], form));
 }
 
-if (window.isSecureContext) {
-  // Header
-  const header = document.getElementById("header");
-  const onOpenJSONClick = async (_: MouseEvent) => {
-    button.disabled = true;
-    button.textContent = 'Loading...';
-    
-    // Remove old form & path if present
-    if (form)  {
-      left.removeChild(form);
-      form = null;
-    }
-    if (preview) {
-      right.removeChild(preview);
-      preview = null;
-    }
 
-    const { fileName, json } = await openFileLoader();
-  
-    pathInput.value = fileName;
-  
-    button.disabled = false;
-    button.textContent = 'Open JSON';
-  
+if (window.isSecureContext) {  
+  const formParent = document.getElementById("formParent");
+  const previewParent = document.getElementById("previewParent");
+
+  const start = (json: string) => {
+    console.log('start');
     jsonObj = JSON.parse(json);
-  
+
     form = createForm();
     fillForm(jsonObj);
-    left.appendChild(form); 
+    formParent.appendChild(form); 
   
     preview = createTextArea({ content: json, id: 'Preview'});
-    right.appendChild(preview);
+    previewParent.appendChild(preview);
+  };
+  
+  const clean = () => {
+    console.log('clean');
+    formParent.removeChild(form);
+    form = null;
+    previewParent.removeChild(preview);
+    preview = null;
   };
 
-  const button = createButton({
-    onclick: onOpenJSONClick,
-    text: 'Open JSON',
+  const w = getSearchWord();
+  let filename =  w ? `${w}.json` : 'recursion.json';
+  const onChangeFilepath = (ev: InputEvent) => {
+    filename = (ev.target as HTMLInputElement).value;
+  };
+
+  const onSaveJSONClick = async (ev: MouseEvent) => {
+    ev.preventDefault();
+    await saveToJSON(preview.value, filename);
+  };
+
+  createFileInput({
+    parent: document.getElementById("file-input"),
+    start,
+    clean,
+    onChangeFilepath,
+    onSaveJSONClick
   });
-  header.appendChild(button);
-
-  const pathInput = createInput({
-    id: 'filepath',
-    value: 'default.json',
-    type: 'text'
-  });
-  header.appendChild(pathInput);
-
-  // Root
-  const root = document.getElementById("root");
-
-  const left = createDiv();
-  left.appendChild(createTitle({ text: 'Form' }));
-  root.appendChild(left);
   
-  const right = createDiv();
-  right.appendChild(createTitle({ text: 'JSON Preview' }));
-  root.appendChild(right);
-
-  
-  const saveBtn = createButton({
-    onclick: async ev => {
-      ev.preventDefault();
-      await saveToJSON(preview.value, pathInput.value);
-    },
-    text: 'Save JSON'
-  });
-  header.appendChild(saveBtn);
-
   dropdown = createDropdown({
     onChange: (e) => {
       const { value } = e.target as HTMLSelectElement;
@@ -221,20 +197,9 @@ if (window.isSecureContext) {
     options: dropdownOptions
   });
 
-  const w = getSearchWord();
-  const filename =  w ? `${w}.json` : 'recursion.json';
-  pathInput.value = filename;
   
   loadExample(filename).then(example => {
-    jsonObj = JSON.parse(example);
-          
-    form = createForm();
-    fillForm(jsonObj);
-    left.appendChild(form);
-    
-    preview = createTextArea({ content: example, id: 'Preview'});
-    right.appendChild(preview);
-
+    start(example);
   });
 }
 

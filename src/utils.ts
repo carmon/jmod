@@ -1,16 +1,16 @@
-export const deepMerge = (source: Object, target: Object): Object => {
+export const deepMerge = (source: Record<string, unknown>, target: Record<string, unknown>): Record<string, unknown> => {
   const result = { ...source,...target };
   const keys = Object.keys(result);
 
   for (const key of keys){
-    const sprop = (<any>source)[key];
-    const tprop = (<any>target)[key];
+    const sprop = source[key];
+    const tprop = target[key];
       
     if(typeof(tprop) == 'object' && typeof(sprop) == 'object') {
       if (Array.isArray(tprop) && Array.isArray(sprop)) 
-        (<any>result)[key] = tprop; // This is by design, target array overwrites source array
+        result[key] = tprop; // This is by design, target array overwrites source array
       else
-        (<any>result)[key] = deepMerge(sprop, tprop);
+        result[key] = deepMerge(sprop as Record<string, unknown>, tprop as Record<string, unknown>);
     }
   }
 
@@ -26,13 +26,14 @@ export const getDefaultValue = (type: AttributeType): string | number | boolean 
  * Clones an object to a new object with default values
  * @param source Object to clone
  */
-export const shallowClone = (source: Object): Object =>
+export const shallowClone = (source: Record<string, unknown>): Record<string, unknown> =>
   Object.keys(source).reduce((prev, curr) => {
-    const value = (<any>source)[curr];
+    const value = source[curr];
     const type = typeof value;
 
     type ValidType = AttributeType | 'object';
-    type ValidValueType = string | boolean | number | object;
+    // This type sucks :point-down:
+    type ValidValueType = string | boolean | number | Record<string, unknown> | unknown[];
 
     const resolveType = (t: ValidType): ValidValueType => {
       if (t === 'object') {
@@ -41,7 +42,7 @@ export const shallowClone = (source: Object): Object =>
         else if (value === null)
           return null;
         
-        return shallowClone(value);
+        return shallowClone(value as Record<string, unknown>);
       }
       return getDefaultValue(t as AttributeType);
     }
