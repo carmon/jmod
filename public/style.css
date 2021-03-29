@@ -10,22 +10,22 @@ body {
 .core {
     display: flex;
     justify-content: space-evenly;
-    width: 1000px;
+    width: 1080px;
     left: 50%;
     position: relative;
-    margin-left: -500px;
+    margin-left: -540px;
 }
 
 .core textarea {
     display: block;
     resize: none;
-    width: 350px;
+    width: 500px;
     height: 95%;
 }
 
 .core form {
     margin-top: 1em;
-    width: 350px;
+    width: 500px;
 }
 
 .core form label {
@@ -40,6 +40,6 @@ body {
 .core form input, 
 .core form button,
 .core form select {
-    display: block;
-    margin-bottom: .5em;
+    /* display: block; */
+    margin: .125em;
 }

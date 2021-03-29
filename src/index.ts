@@ -16,9 +16,7 @@ if (window.isSecureContext) {
   const formParent = document.getElementById("formParent");
   const previewParent = document.getElementById("previewParent");
   if (formParent && previewParent) {
-    const start = (json: string) => {
-      console.log('start');
-  
+    const start = (json: string) => {  
       preview = createTextArea({ content: json, id: 'Preview'});
       const setValue = (value: string): void => {
         if (preview)
@@ -26,17 +24,11 @@ if (window.isSecureContext) {
       }
       previewParent.appendChild(preview);
   
-      form = createForm({
-        formParent,
-        json,
-        setValue
-      });
+      form = createForm({ json, setValue });
       formParent.appendChild(form);
     };
   
     const clean = () => {
-      console.log('clean');
-  
       if (preview) {
         previewParent.removeChild(preview);
         preview = null;

@@ -10,6 +10,7 @@ export const createButton = ({ id, onclick, text }: ButtonProps): HTMLButtonElem
   if (id) button.id = id;
   button.onclick = onclick || null;
   button.textContent = text;
+  button.type = 'button';
   return button;
 };
 

@@ -1,13 +1,27 @@
 import { createButton, createTable, createTableCell, createTableRow } from "../dom.js";
 import { generateInputFrom } from "./input.js";
 
-export const generateTableRow = (text: string, value: string, id: string): HTMLTableRowElement => {
+interface TableRowFromProps {
+  id: string;
+  text: string;
+  value: string;
+  onInputFocus?: (e: Event) => void;
+}
+
+export const generateTableRow = ({
+  id,
+  text, 
+  value,
+  onInputFocus 
+}: TableRowFromProps): HTMLTableRowElement => {
   const row = createTableRow();
   row.appendChild(
     createTableCell({ text })
   );
   const val = createTableCell();
-  val.appendChild(generateInputFrom({value, id}));
+  val.appendChild(
+    generateInputFrom({ id, value, onFocus: onInputFocus })
+  );
   row.appendChild(val);
   const rem = createTableCell();
   rem.appendChild(
@@ -22,9 +36,10 @@ interface TableFromProps {
   value: unknown[];
   onChange: (e: Event) => void;
   onClick: (e: Event) => void;
+  onInputFocus?: (e: Event) => void;
 }
 
-export const generateTableFrom = ({ id, value, onChange, onClick }: TableFromProps): HTMLTableElement => {
+export const generateTableFrom = ({ id, value, onChange, onClick, onInputFocus }: TableFromProps): HTMLTableElement => {
   const t = createTable({ 
     id, 
     onChange, 
@@ -32,7 +47,12 @@ export const generateTableFrom = ({ id, value, onChange, onClick }: TableFromPro
   });
   value.forEach((childValue, i) => {
     t.appendChild(
-      generateTableRow(i.toString(), childValue as string, `${id}-${i}`)
+      generateTableRow({ 
+        id: `${id}-${i}`,
+        text: i.toString(), 
+        value: childValue as string,
+        onInputFocus,
+      }) 
     );
   });
 
@@ -43,7 +63,7 @@ export const generateTableFrom = ({ id, value, onChange, onClick }: TableFromPro
   );
   const add = createTableCell();
   add.appendChild(
-    createButton({ id: `${id}-add`, text: 'Add'})
+    createButton({ id: `${id}-add`, text: 'Add' })
   );
   last.appendChild(add);
   last.appendChild(

@@ -29,9 +29,10 @@ export const generateLabelFrom = ({
       label.appendChild(
         generateTableFrom({ 
           id, 
-          value, 
+          value,
           onChange: onTableChange, 
-          onClick: onTableClick 
+          onClick: onTableClick,
+          onInputFocus,
         })
       );
     } else if (value === null) {

@@ -8,11 +8,10 @@ import {
 import { generateTableFrom, generateTableRow } from './table.js';
 import { generateInputFrom } from './input.js';
 import { /*cloneToDefault,*/ deepMerge, getDefaultValue, setProp, AttributeType, getProp } from './utils.js';
-import { getInputType } from './values.js';
+// import { getInputType } from './values.js';
 import { generateLabelFrom } from './label.js';
 
 interface CoreProps {
-    formParent: HTMLElement;
     json: string;
     setValue: (value: string) => void;
 }
@@ -24,7 +23,6 @@ const getValueFromInput = ({ checked, type, value }: HTMLInputElement) =>
   type === 'checkbox' ? checked : type === 'number' ? Number(value) : value
 
 export default ({
-  formParent,
   json,
   setValue,
 }: CoreProps): HTMLFormElement => {
@@ -34,30 +32,23 @@ export default ({
   const handleInputChange = (input: HTMLInputElement) => {  
     const { id } = input;
     const targetValue = getValueFromInput(input);
-    if (id.includes('-')) {
-      const keys = id.split('-');
-
-      const modified = keys.reduceRight(
-        (prev, curr): unknown => ({ [curr]: prev }),
-        targetValue
-      ) as Record<string, unknown>;
-
-      jsonObj = deepMerge(jsonObj, modified);
-    } else {
-      jsonObj[id] = targetValue;
-    }
-    setValue(JSON.stringify(jsonObj, null, 2));
-  };
-
-  const handleArrayChange = (path: string[], value: unknown) => {
-    setProp(jsonObj, path, value);
+    if (id.includes('-')) 
+      setProp(jsonObj, id.split('-'), targetValue);
+    else
+      setProp(jsonObj, [id], targetValue);
+    
     setValue(JSON.stringify(jsonObj, null, 2));
   };
   
   const handleTableChange = (e: Event) => {
-    // eslint-disable-next-line no-debugger
+    console.log('handleTableChange', e);
+
+    const isInput = e.target.constructor === HTMLInputElement;
+    if (!isInput) return;  
+    
     const input = e.target as HTMLInputElement;
-    handleArrayChange(input.id.split('-'), getValueFromInput(input));
+    setProp(jsonObj, input.id.split('-'), getValueFromInput(input));
+    setValue(JSON.stringify(jsonObj, null, 2));
   };
 
   const handleTableClick = (e: Event) => {
@@ -72,7 +63,8 @@ export default ({
     const value = getProp(jsonObj, path);
     if (!Array.isArray(value)) return;
 
-    const btnKeys = (e.target as HTMLButtonElement).id.split('-');
+    const btnId = (e.target as HTMLButtonElement).id;
+    const btnKeys = btnId.split('-');
 
     if (btnKeys[btnKeys.length - 1] === 'rem') {
       const it = Number(btnKeys[btnKeys.length - 2]);
@@ -91,11 +83,12 @@ export default ({
       const lastRow = table.lastElementChild;
       const it = value.length.toString();
       table.appendChild(
-        generateTableRow(
-          it,
-          defaultValue as string,
-          `${table.id}-${it}`
-        )
+        generateTableRow({
+          id: `${table.id}-${it}`,
+          text: it,
+          value: defaultValue as string,
+          onInputFocus: handleInputFocus
+        })
       );
       table.appendChild(lastRow);
   
@@ -115,9 +108,10 @@ export default ({
     }
   }
 
+  // Create form with JSON attributes /////////////////////////////////////////////////////
   const keys = Object.keys(jsonObj);
   keys.forEach(k => {
-    form.append(
+    form.appendChild(
       generateLabelFrom({
         id: k, 
         value: jsonObj[k],
@@ -128,36 +122,40 @@ export default ({
       })
     );
   });
-  formParent.appendChild(form);
+  /////////////////////////////////////////////////////////////////////////////////////////
 
   const onDropdownChange = (e: Event) => {
     const { value } = e.target as HTMLSelectElement;
     const input = currentInput;
     if (!input) return;
-    
-    if (value === 'string') 
-      input.oninput = () => handleInputChange(input);
-    else 
-      input.onchange = () => handleInputChange(input);
-    
-    input.type = getInputType(value);
 
-    if (value === 'boolean') input.checked = false;
-    if (value === 'number') input.value = '0';
-    if (value === 'string') input.value = '';
-    if (value === 'array') {
-      // TO DO
-    }
+    console.log(value);
+    
+    // if (value === 'string') 
+    //   input.oninput = () => handleInputChange(input);
+    // else 
+    //   input.onchange = () => handleInputChange(input);
+    
+    // input.type = getInputType(value);
 
-    handleInputChange(input);
-    input.focus();
+    // if (value === 'boolean') input.checked = false;
+    // if (value === 'number') input.value = '0';
+    // if (value === 'string') input.value = '';
+    // if (value === 'array') {
+    //   // TO DO
+    // }
+
+    // handleInputChange(input);
+    // input.focus();
   };
-
-  
   
   const dropdown = createDropdown({
     onChange: onDropdownChange,
     options: dropdownOptions
+  });
+
+  const addLabel = createLabel({
+    key: 'Add new prop'
   });
 
   let keyIt = 0;
@@ -187,13 +185,24 @@ export default ({
       const type = formDropdown.value; 
       const label = createLabel({ key });
       if (type === 'array') {
-        const table = generateTableFrom({ id: key, value: [defaultValue], onChange: handleTableChange, onClick: handleTableClick });
+        const table = generateTableFrom({ 
+          id: key, 
+          value: [defaultValue], 
+          onChange: handleTableChange, 
+          onClick: handleTableClick,
+          onInputFocus: handleInputFocus
+        });
         label.appendChild(table);
         form.appendChild(label);
 
         jsonObj = isArray ? [...jsonObj, defaultValue] : { ...jsonObj, [key]: [defaultValue] };
       } else {
-        const input = generateInputFrom({ id: key, value: defaultValue as string | boolean });
+        const input = generateInputFrom({ 
+          id: key, 
+          value: defaultValue as string | boolean,
+          onChange: (e: Event) => handleInputChange(e.currentTarget as HTMLInputElement),
+          onFocus: handleInputFocus
+        });
         label.appendChild(input);
         form.appendChild(label);
         input.focus();
@@ -201,17 +210,18 @@ export default ({
         jsonObj = isArray ? [...jsonObj, defaultValue] : { ...jsonObj, [key]: defaultValue };
       }      
       
-      form.appendChild(formInput);
-      form.appendChild(formDropdown);
-      form.appendChild(addBtn);
+      form.appendChild(addLabel);
 
       setValue(JSON.stringify(jsonObj, null, 2));
     },
     text: 'Add'
   });
 
-  form.appendChild(formInput);
-  form.appendChild(formDropdown);
-  form.appendChild(addBtn);
+  addLabel.appendChild(formInput);
+  addLabel.appendChild(formDropdown);
+  addLabel.appendChild(addBtn);
+
+  form.appendChild(addLabel);
+
   return form;
 }
