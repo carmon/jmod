@@ -9,7 +9,7 @@ interface FileInputProps {
     parent:  HTMLElement;
     start: (json: string) => void;
     clean: () => void;
-    onChangeFilepath: (ev: InputEvent) => void;
+    onChangeFilepath: (ev: Event) => void;
     onSaveJSONClick: (ev: MouseEvent) => void;
 }
 

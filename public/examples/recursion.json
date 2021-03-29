@@ -6,11 +6,11 @@
     "dev": {
         "numeros": [42, 666, 1986],
         "inner": {
-        "array": [
-            "ke se yo",
-            "pepe"
-        ],
-        "locro": null
+            "array": [
+                "ke se yo",
+                "pepe"
+            ],
+            "locro": null
         }
     }
 }
