@@ -15,14 +15,15 @@ export const createButton = ({ id, onclick, text }: ButtonProps): HTMLButtonElem
 };
 
 interface LabelProps {
-  key: string;
+  htmlFor?: string;
   text?: string;
 }
 
-export const createLabel = ({ key }: LabelProps): HTMLLabelElement => {
+export const createLabel = ({ htmlFor, text }: LabelProps): HTMLLabelElement => {
   const label = document.createElement('label');
-  label.htmlFor = key;
-  label.textContent = key;
+  if (htmlFor)
+    label.htmlFor = htmlFor;
+  label.textContent = text;
   return label;
 };
 
