@@ -4,7 +4,7 @@ import { getInputType } from "../values.js";
 interface ValueViewProps {
   id?: string;
   key?: string;
-  value: string | boolean | null;
+  value: string | boolean | null | number;
   onChange?: (e: Event) => void;
   onFocus?: (e: Event) => void;
   onRemove: (view: HTMLLabelElement) => void;

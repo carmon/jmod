@@ -1,9 +1,12 @@
-import { createLabel } from "../../dom.js";
+import { createButton, createLabel } from "../../dom.js";
+import { getDefaultValue } from "../object.js";
+import { getValueType } from "../values.js";
 import { generateValueView } from "./value.js";
 
 interface AttributeViewProps {
   id: string;
   value: unknown;
+  onAddToArray: (id: string, value: unknown) => void;
   onInputChange: (e: Event) => void;
   onInputFocus: (e: Event) => void;
   onRemove: (id: string) => void;
@@ -11,7 +14,8 @@ interface AttributeViewProps {
 
 export const generateAttributeView = ({
   id, 
-  value, 
+  value,
+  onAddToArray,
   onInputChange, 
   onInputFocus,
   onRemove,
@@ -47,11 +51,53 @@ export const generateAttributeView = ({
           onFocus: onInputFocus,
           onRemove: (el) => {
             label.removeChild(el);
+            for (let i = it; i < label.children.length - 1; i++) {
+              const newId = `${id}-${i}`;
+              const childLabel = label.children[i] as HTMLLabelElement;
+              childLabel.htmlFor = newId;
+              childLabel.firstChild.textContent = i.toString();
+              childLabel.firstElementChild.id = newId;
+            }
             onRemove(valueId);
           }
         })
       );
     });
+
+    const addBtn = createButton({
+      id: `${id}-add`,
+      text: 'Add',
+      onclick: () => {
+        const key = (label.children.length - 1).toString();
+        const { type } = label.children[label.children.length - 2].firstElementChild as HTMLInputElement;
+        const newValue = getDefaultValue(getValueType(type));
+        const newValueId = `${id}-${key}`;
+        label.appendChild(
+          generateValueView({
+            id: newValueId,
+            key: `${key}`,
+            value: newValue,
+            onChange: onInputChange,
+            onFocus: onInputFocus,
+            onRemove: (el) => {
+              label.removeChild(el);
+              for (let i = value.length; i < label.children.length; i++) {
+                const newId = `${id}-${i}`;
+                const childLabel = label.children[i] as HTMLLabelElement;
+                childLabel.htmlFor = newId;              
+                childLabel.firstChild.textContent = i.toString();
+                childLabel.firstElementChild.id = newId;
+              }
+              onRemove(newValueId);
+            }
+          })
+        );
+        label.appendChild(addBtn);
+        onAddToArray(id, newValue);
+      }
+    });
+    
+    label.appendChild(addBtn);
   } 
   else {
     Object.keys(value).forEach(k => {
@@ -59,6 +105,7 @@ export const generateAttributeView = ({
         generateAttributeView({ 
           id: `${id}-${k}`, 
           value: (<Record<string, unknown>>value)[k],
+          onAddToArray,
           onInputChange,
           onInputFocus,
           onRemove
