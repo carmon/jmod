@@ -23,14 +23,25 @@ export const getProp = (object: Record<string, unknown>, keys: string[]): unknow
 }
 
 export const deleteProp = (object: Record<string, unknown>, keys: string[]): void => {
-  if(keys.length > 1){
+  if (keys.length > 1) {
     object[keys[0]] = object[keys[0]] || {};
-    if (Array.isArray(object[keys[0]]))
-      (object[keys[0]] as unknown[]).splice(Number(keys[1]), 1);
-    else 
+    if (Array.isArray(object[keys[0]])) {
+      if (keys.length > 1) {
+        const [first, ...rest] = keys;
+        deleteProp(object[first] as Record<string, unknown>, rest);
+      }
+      else {
+        (object[keys[0]] as unknown[]).splice(Number(keys[1]), 1);
+      }
+    }
+    else {
       deleteProp(object[keys[0]] as Record<string, unknown>, keys.slice(1));
+    } 
     
     return;
   }
-  delete object[keys[0]];
+  if (Array.isArray(object))
+    (object as unknown[]).splice(Number(keys[0]), 1);
+  else
+    delete object[keys[0]];
 }

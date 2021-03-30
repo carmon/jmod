@@ -30,6 +30,8 @@ export const createLabel = ({ className, htmlFor, text }: LabelProps): HTMLLabel
   return label;
 };
 
+export const createLineBreak = (): HTMLBRElement => document.createElement('br');
+
 export const createForm = (): HTMLFormElement => document.createElement('form');
 
 interface InputProps {

@@ -27,15 +27,6 @@ body {
     margin-top: 1em;
     width: 500px;
 }
-/*
-.core form > label input {
-   background-color: red;
-}
-
-.core form > label label input {
-    background-color: green;
- }
- */
 
 .core form label {
     color: black;

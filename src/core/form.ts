@@ -20,6 +20,7 @@ export default ({
   setValue,
 }: CoreProps): HTMLFormElement => {
   let jsonObj = JSON.parse(json);
+  const isArray = Array.isArray(jsonObj); 
   const form = createForm();
 
   const handleInputChange = (input: HTMLInputElement) => {  
@@ -51,20 +52,28 @@ export default ({
 
   const handleRemoveAttribute = (id: string) => {
     const keys = id.split('-');
-    if (keys.length === 1) 
-      form.removeChild(form[keys[0]].parentNode);
-    
-    deleteProp(jsonObj, keys);
-    setValue(JSON.stringify(jsonObj, null, 2));
+
+    if (isArray) {
+      if (keys.length > 1) {
+        const [first, ...rest] = keys;
+        deleteProp(jsonObj[first], rest);
+      }
+      else {
+        deleteProp(jsonObj, keys);
+      } 
+    } else {
+      deleteProp(jsonObj, keys);
+    }
+    setValue(JSON.stringify(jsonObj, null, 2));    
   };
 
   // Create form with JSON attributes /////////////////////////////////////////////////////
-  const keys = Object.keys(jsonObj);
-  keys.forEach(k => {
+  const keys = isArray ? jsonObj : Object.keys(jsonObj);
+  keys.forEach((k: string, i: number) => {
     form.appendChild(
       generateAttributeView({
-        id: k, 
-        value: jsonObj[k],
+        id: isArray ? i.toString() : k, 
+        value: isArray ? jsonObj[i] : jsonObj[k],
         onAddToArray: handleAddToArray,
         onInputChange: (e) => handleInputChange(e.currentTarget as HTMLInputElement),
         onInputFocus: handleInputFocus,
@@ -94,8 +103,7 @@ export default ({
     currentInput.focus();
   };
 
-  const handleAddAttribute = (baseKey: string, type: string): void => {
-    const isArray = Array.isArray(jsonObj); 
+  const handleAddAttribute = (baseKey: string, type: string): void => {    
     const key = isArray ? `${baseKey}-${jsonObj.length}` : baseKey;
 
     if (jsonObj[key] !== undefined) {

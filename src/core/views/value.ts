@@ -1,9 +1,10 @@
-import { createButton, createInput, createLabel } from "../../dom.js";
+import { createButton, createInput, createLabel, createLineBreak } from "../../dom.js";
 import { getInputType } from "../values.js";
 
 interface ValueViewProps {
   id?: string;
   key?: string;
+  lineBreak?: boolean;
   value: string | boolean | null | number;
   onChange?: (e: Event) => void;
   onFocus?: (e: Event) => void;
@@ -13,6 +14,7 @@ interface ValueViewProps {
 export const generateValueView = ({ 
   id, 
   key,
+  lineBreak,
   value, 
   onChange, 
   onFocus,
@@ -21,6 +23,9 @@ export const generateValueView = ({
   const isNull = value === null; 
   const type = isNull ? 'string' : typeof value;
   const label = createLabel({ htmlFor: id, text: key || id });
+  if (lineBreak) 
+    label.appendChild(createLineBreak());
+  
   label.appendChild(
     createInput({
       disabled: isNull,
