@@ -81,8 +81,10 @@ export default ({
     if (value === 'boolean') {
       currentInput.checked = false;
       currentInput.onchange = () => handleInputChange(currentInput);
+      currentInput.oninput = null;
     } else {
       currentInput.value = value === 'string' ? '' : '0';
+      currentInput.onchange = null;
       currentInput.oninput = () => handleInputChange(currentInput);
     } 
     

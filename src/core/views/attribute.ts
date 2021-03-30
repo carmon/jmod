@@ -32,7 +32,8 @@ export const generateAttributeView = ({
       value: value as string | boolean | null,
       onChange: onInputChange, 
       onFocus: onInputFocus,
-      onRemove: () => {
+      onRemove: (el) => {
+        el.parentElement.removeChild(el);
         onRemove(id)
       }
     });
@@ -40,6 +41,17 @@ export const generateAttributeView = ({
   
   const label = createLabel({ text: key });
   if (Array.isArray(value)) {
+    const getRemoveFromArray = (valueId: string, it: number) => (el: HTMLLabelElement) => {
+      label.removeChild(el);
+      for (let i = it; i < label.children.length - 1; i++) {
+        const newId = `${id}-${i}`;
+        const childLabel = label.children[i] as HTMLLabelElement;
+        childLabel.htmlFor = newId;
+        childLabel.firstChild.textContent = i.toString();
+        childLabel.firstElementChild.id = newId;
+      }
+      onRemove(valueId);
+    };
     value.forEach((v, it) => {
       const valueId = `${id}-${it}`;
       label.appendChild(
@@ -49,22 +61,13 @@ export const generateAttributeView = ({
           value: v as string | boolean | null,
           onChange: onInputChange,
           onFocus: onInputFocus,
-          onRemove: (el) => {
-            label.removeChild(el);
-            for (let i = it; i < label.children.length - 1; i++) {
-              const newId = `${id}-${i}`;
-              const childLabel = label.children[i] as HTMLLabelElement;
-              childLabel.htmlFor = newId;
-              childLabel.firstChild.textContent = i.toString();
-              childLabel.firstElementChild.id = newId;
-            }
-            onRemove(valueId);
-          }
+          onRemove: getRemoveFromArray(valueId, it)
         })
       );
     });
 
     const addBtn = createButton({
+      className: 'add-btn',
       id: `${id}-add`,
       text: 'Add',
       onclick: () => {
@@ -79,17 +82,7 @@ export const generateAttributeView = ({
             value: newValue,
             onChange: onInputChange,
             onFocus: onInputFocus,
-            onRemove: (el) => {
-              label.removeChild(el);
-              for (let i = value.length; i < label.children.length; i++) {
-                const newId = `${id}-${i}`;
-                const childLabel = label.children[i] as HTMLLabelElement;
-                childLabel.htmlFor = newId;              
-                childLabel.firstChild.textContent = i.toString();
-                childLabel.firstElementChild.id = newId;
-              }
-              onRemove(newValueId);
-            }
+            onRemove: getRemoveFromArray(newValueId, value.length)
           })
         );
         label.appendChild(addBtn);

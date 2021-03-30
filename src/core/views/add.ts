@@ -5,8 +5,17 @@ interface AddViewProps {
   onAdd: (key: string, type: string) => void;
 }
 
+const createContainer = (text: string, child: HTMLInputElement | HTMLSelectElement) => {
+  const label = createLabel({ text });
+  label.appendChild(child);
+  return label;
+};
+
 export const generateAddView = ({ types, onAdd }: AddViewProps): HTMLLabelElement => {
-  const label = createLabel({ text: 'Add new attribute' });
+  const label = createLabel({
+    className: 'add-view',
+    text: 'Add new attribute' 
+  });
   const formDropdown = createDropdown({
     options: types
   });
@@ -17,9 +26,10 @@ export const generateAddView = ({ types, onAdd }: AddViewProps): HTMLLabelElemen
     type: 'text',
     value: `key${keyIt}`
   });
-  label.appendChild(formInput);
-  label.appendChild(formDropdown);
+  label.appendChild(createContainer('Key', formInput));
+  label.appendChild(createContainer('ValueType', formDropdown));
   label.appendChild(createButton({
+    className: 'add-btn',
     onclick: () => {
       onAdd(formInput.value, formDropdown.value);
       keyIt++;

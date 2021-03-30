@@ -1,12 +1,14 @@
 // DOM utility, has direct access to document global object
 interface ButtonProps {
+  className?: string;
   id?: string;
   onclick?: (ev: MouseEvent) => void;
   text: string;
 }
 
-export const createButton = ({ id, onclick, text }: ButtonProps): HTMLButtonElement => {
+export const createButton = ({ className, id, onclick, text }: ButtonProps): HTMLButtonElement => {
   const button = document.createElement('button');
+  if (className) button.className = className;
   if (id) button.id = id;
   button.onclick = onclick || null;
   button.textContent = text;
@@ -15,14 +17,15 @@ export const createButton = ({ id, onclick, text }: ButtonProps): HTMLButtonElem
 };
 
 interface LabelProps {
+  className?: string;
   htmlFor?: string;
   text?: string;
 }
 
-export const createLabel = ({ htmlFor, text }: LabelProps): HTMLLabelElement => {
+export const createLabel = ({ className, htmlFor, text }: LabelProps): HTMLLabelElement => {
   const label = document.createElement('label');
-  if (htmlFor)
-    label.htmlFor = htmlFor;
+  if (className) label.className = className;
+  if (htmlFor) label.htmlFor = htmlFor;
   label.textContent = text;
   return label;
 };
