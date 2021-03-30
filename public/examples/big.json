@@ -1,0 +1,44 @@
+{
+    "dev": {
+      "objArray": [
+        {
+          "a": "hola",
+          "before": 1,
+          "mindfuck": [
+            6,
+            7,
+            8,
+            0
+          ]
+        }
+      ],
+      "objArrayb": [
+        {
+          "a": "hola",
+          "before": 1,
+          "mindfuck": [
+            6,
+            7,
+            8,
+            0
+          ]
+        }
+      ],
+      "recursion": {
+            "name": "jmod-get-started",
+            "version": "1.0.0",
+            "lockfileVersion": 1,
+            "requires": false,
+            "dev": {
+                "numeros": [42, 666, 1986],
+                "inner": {
+                    "array": [
+                        "ke se yo",
+                        "pepe"
+                    ],
+                    "locro": null
+                }
+            }
+        }
+    }
+  }

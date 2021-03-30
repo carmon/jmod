@@ -1,27 +1,36 @@
 // DOM utility, has direct access to document global object
 interface ButtonProps {
+  className?: string;
+  id?: string;
   onclick?: (ev: MouseEvent) => void;
   text: string;
 }
 
-export const createButton = ({ onclick, text }: ButtonProps): HTMLButtonElement => {
+export const createButton = ({ className, id, onclick, text }: ButtonProps): HTMLButtonElement => {
   const button = document.createElement('button');
-  button.onclick = onclick;
+  if (className) button.className = className;
+  if (id) button.id = id;
+  button.onclick = onclick || null;
   button.textContent = text;
+  button.type = 'button';
   return button;
 };
 
 interface LabelProps {
-  key: string;
+  className?: string;
+  htmlFor?: string;
   text?: string;
 }
 
-export const createLabel = ({ key }: LabelProps): HTMLLabelElement => {
+export const createLabel = ({ className, htmlFor, text }: LabelProps): HTMLLabelElement => {
   const label = document.createElement('label');
-  label.htmlFor = key;
-  label.textContent = key;
+  if (className) label.className = className;
+  if (htmlFor) label.htmlFor = htmlFor;
+  label.textContent = text;
   return label;
 };
+
+export const createLineBreak = (): HTMLBRElement => document.createElement('br');
 
 export const createForm = (): HTMLFormElement => document.createElement('form');
 
@@ -39,13 +48,10 @@ export const createInput = ({ disabled, id, onChange, onFocus, type, value }: In
   input.disabled = !!disabled;
   input.id = id;
   input.type = type;
-  if (onChange) {
-    if (type === 'text') 
-      input.oninput = onChange;
-    else
-      input.onchange = onChange;
-  }
-  input.onfocus = onFocus;
+  if (onChange) 
+    input.oninput = onChange;
+  
+  input.onfocus = onFocus || null;
   if (type === 'checkbox')
     input.checked = value as boolean;
   else
@@ -61,13 +67,13 @@ interface TextAreaProps {
 export const createTextArea = ({ content, id }: TextAreaProps): HTMLTextAreaElement => {
   const textArea = document.createElement('textarea');
   textArea.value = content;
-  textArea.id = id;
+  textArea.id = id || '';
   textArea.disabled = true;
   textArea.readOnly = true;
   return textArea;
 }
 interface DropdownProps {
-  onChange: (e: Event) => void;
+  onChange?: (e: Event) => void;
   options: string[];
 }
 
@@ -82,3 +88,31 @@ export const createDropdown = ({ onChange, options }: DropdownProps): HTMLSelect
   sel.onchange = onChange;
   return sel;
 };
+
+interface TableProps {
+  id: string;
+  onChange: (e: Event) => void;
+  onClick: (e: Event) => void;
+}
+
+export const createTable = ({ id, onChange, onClick }: TableProps): HTMLTableElement => {
+  const t = document.createElement('table');
+  t.id = id;
+  t.oninput = onChange;
+  t.onclick = onClick;
+  return t;
+}
+
+export const createTableRow = (): HTMLTableRowElement => document.createElement('tr');
+
+interface TableCellProps {
+  text?: string;
+}
+
+export const createTableCell = (props?: TableCellProps): HTMLTableDataCellElement => {
+  const cell = document.createElement('td');
+  if (props) {
+    cell.textContent = props.text;
+  }
+  return cell;
+} 
