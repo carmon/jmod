@@ -16,6 +16,25 @@ export const createButton = ({ className, id, onclick, text }: ButtonProps): HTM
   return button;
 };
 
+interface LabelProps {
+  className?: string;
+  htmlFor?: string;
+  text?: string;
+}
+
+export const createLabel = ({ className, htmlFor, text }: LabelProps): HTMLLabelElement => {
+  const label = document.createElement('label');
+  if (className) label.className = className;
+  if (htmlFor) label.htmlFor = htmlFor;
+  label.style.borderColor = `#${Math.floor(Math.random()*16777215).toString(16)}`;
+  label.textContent = text;
+  return label;
+};
+
+export const createLineBreak = (): HTMLBRElement => document.createElement('br');
+
+export const createForm = (): HTMLFormElement => document.createElement('form');
+
 interface InputProps {
   disabled?: boolean;
   id: string;
@@ -32,6 +51,11 @@ export const createInput = ({ disabled, id, onChange, onFocus, type, value }: In
   input.type = type;
   if (onChange) 
     input.oninput = onChange;
+
+  input.onkeydown = (e) => {    
+    if (e.key === 'Enter')
+      e.preventDefault();
+  }
   
   input.onfocus = onFocus || null;
   if (type === 'checkbox')
@@ -41,16 +65,19 @@ export const createInput = ({ disabled, id, onChange, onFocus, type, value }: In
   return input;
 };
 
-interface TextAreaProps {
-  content: string;
-  id?: string;
+interface DropdownProps {
+  onChange?: (e: Event) => void;
+  options: string[];
 }
 
-export const createTextArea = ({ content, id }: TextAreaProps): HTMLTextAreaElement => {
-  const textArea = document.createElement('textarea');
-  textArea.value = content;
-  textArea.id = id || '';
-  textArea.disabled = true;
-  textArea.readOnly = true;
-  return textArea;
-}
+export const createDropdown = ({ onChange, options }: DropdownProps): HTMLSelectElement => {
+  const sel = document.createElement('select');
+  options.forEach(o => {
+    const opt = document.createElement('option');
+    opt.textContent = o;
+    opt.value = o;
+    sel.appendChild(opt);
+  });
+  sel.onchange = onChange;
+  return sel;
+};

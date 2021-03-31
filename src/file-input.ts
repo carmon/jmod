@@ -6,6 +6,7 @@ import {
 import { openFileLoader } from './nativefs.js';
 
 interface FileInputProps {
+    filename: string;
     parent:  HTMLElement;
     start: (json: string) => void;
     clean: () => void;
@@ -14,6 +15,7 @@ interface FileInputProps {
 }
 
 export default ({
+  filename,
   parent,
   start,
   clean,
@@ -45,7 +47,7 @@ export default ({
   const pathInput = createInput({
     id: 'filepath',
     onChange: onChangeFilepath,
-    value: 'default.json',
+    value: filename,
     type: 'text'
   });
   parent.appendChild(pathInput);

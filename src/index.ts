@@ -55,6 +55,7 @@ if (window.isSecureContext) {
     const fileInputParent = document.getElementById("file-input");
     if (fileInputParent) {
       createFileInput({
+        filename,
         parent: fileInputParent,
         start,
         clean,

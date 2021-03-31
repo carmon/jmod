@@ -35,6 +35,7 @@ body {
     font-weight: bold;
     text-align: left;
     margin-left: .5em;
+    border: 1px solid;
 }
 
 .core form input, 
@@ -48,8 +49,9 @@ body {
 }
 
 .add-view {
-    margin-top: 1rem;
-    border: 1px solid green;
+    margin-top: 1em;
+    padding: .5em;
+    border: 1px solid;
     width: 240px;
 }
 
