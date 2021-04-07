@@ -91,13 +91,13 @@ export const generateAttributeView = ({
       types: dropdownOptions,
       onAdd: (_: string, type: string) => {
         // Array length: label childs len - this view
-        const valuesLen = label.children.length - 1; 
-        const key = valuesLen.toString();        
+        const valuesLen = label.children.length - 1;
+        const key = valuesLen.toString();
         const newValueId = `${id}-${key}`;
         if (type === 'array') {
           label.appendChild(
             generateAttributeView({ 
-              id: `${id}-${key}`, 
+              id: newValueId, 
               value: [0],
               onAddToArray,
               onAddToObject,
@@ -111,8 +111,8 @@ export const generateAttributeView = ({
         else if (type === 'object') {
           label.appendChild(
             generateAttributeView({ 
-              id, 
-              value: { [newValueId]: 0 },
+              id: newValueId, 
+              value: { 'key': 0 },
               onAddToArray,
               onAddToObject,
               onInputChange,
@@ -120,7 +120,7 @@ export const generateAttributeView = ({
               onRemove
             })
           );
-          onAddToArray(id, { [newValueId]: 0 });
+          onAddToArray(id, { 'key': 0 });
         } else {
           const defaultValue = getDefaultValue(type as AttributeType);
           label.appendChild(
@@ -162,7 +162,7 @@ export const generateAttributeView = ({
         if (type === 'array') {
           label.appendChild(
             generateAttributeView({ 
-              id: `${id}-${key}`, 
+              id: newValueId, 
               value: [0],
               onAddToArray,
               onAddToObject,
@@ -177,12 +177,10 @@ export const generateAttributeView = ({
           const objValue =  { ['key']: 0 };
           label.appendChild(
             generateAttributeView({ 
-              id, 
+              id: newValueId,
               value: objValue,
               onAddToArray,
-              onAddToObject: (parentId, value) => {
-                onAddToObject(`${parentId}-${key}`, value);
-              },
+              onAddToObject,
               onInputChange,
               onInputFocus,
               onRemove
