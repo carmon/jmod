@@ -1,6 +1,10 @@
-import { createButton, createLabel } from "../../dom.js";
-import { AttributeType, getDefaultValue } from "../object.js";
-import { getValueType } from "../values.js";
+import { createLabel } from "../../dom.core.js";
+import { 
+  AttributeType,
+  dropdownOptions, 
+  getDefaultValue
+} from "../values.js";
+import { generateAddView } from "./add.js";
 import { generateValueView } from "./value.js";
 
 interface AttributeViewProps {
@@ -8,6 +12,7 @@ interface AttributeViewProps {
   lineBreak?: boolean;
   value: unknown;
   onAddToArray: (id: string, value: unknown) => void;
+  onAddToObject: (id: string, value: unknown) => void;
   onInputChange: (e: Event) => void;
   onInputFocus: (e: Event) => void;
   onRemove: (id: string) => void;
@@ -18,6 +23,7 @@ export const generateAttributeView = ({
   lineBreak,
   value,
   onAddToArray,
+  onAddToObject,
   onInputChange, 
   onInputFocus,
   onRemove,
@@ -63,6 +69,7 @@ export const generateAttributeView = ({
           lineBreak: false,
           value: v,
           onAddToArray,
+          onAddToObject,
           onInputChange,
           onInputFocus,
           onRemove: (key) => {
@@ -79,34 +86,59 @@ export const generateAttributeView = ({
         }));
     });
 
-    const addBtn = createButton({
-      className: 'add-btn',
-      id: `${id}-add`,
-      text: 'Add',
-      onclick: () => {
-        const valuesLen = label.children.length - 1; 
+    const addView = generateAddView({
+      noKey: true,
+      types: dropdownOptions,
+      onAdd: (_: string, type: string) => {
+        // Array length: label childs len - this view
+        const valuesLen = label.children.length - 1;
         const key = valuesLen.toString();
-        const type = valuesLen 
-          ? getValueType((label.children[valuesLen - 1].firstElementChild as HTMLInputElement).type)
-          : 'string';
-        const newValue = getDefaultValue(type as AttributeType);
         const newValueId = `${id}-${key}`;
-        label.appendChild(
-          generateValueView({
-            id: newValueId,
-            key: `${key}`,
-            value: newValue,
-            onChange: onInputChange,
-            onFocus: onInputFocus,
-            onRemove: getRemoveFromArray(newValueId, value.length)
-          })
-        );
-        label.appendChild(addBtn);
-        onAddToArray(id, newValue);
-      }
-    });
-    
-    label.appendChild(addBtn);
+        if (type === 'array') {
+          label.appendChild(
+            generateAttributeView({ 
+              id: newValueId, 
+              value: [0],
+              onAddToArray,
+              onAddToObject,
+              onInputChange,
+              onInputFocus,
+              onRemove
+            })
+          );
+          onAddToArray(id, [0]);
+        } 
+        else if (type === 'object') {
+          label.appendChild(
+            generateAttributeView({ 
+              id: newValueId, 
+              value: { 'key': 0 },
+              onAddToArray,
+              onAddToObject,
+              onInputChange,
+              onInputFocus,
+              onRemove
+            })
+          );
+          onAddToArray(id, { 'key': 0 });
+        } else {
+          const defaultValue = getDefaultValue(type as AttributeType);
+          label.appendChild(
+            generateValueView({
+              id: newValueId,
+              key: `${key}`,
+              value: defaultValue,
+              onChange: onInputChange,
+              onFocus: onInputFocus,
+              onRemove: getRemoveFromArray(newValueId, value.length)
+            })
+          );
+          onAddToArray(id, defaultValue);
+        }        
+        label.appendChild(addView);
+      },
+    });    
+    label.appendChild(addView);
   } 
   else {
     Object.keys(value).forEach(k => {
@@ -115,12 +147,67 @@ export const generateAttributeView = ({
           id: `${id}-${k}`, 
           value: (<Record<string, unknown>>value)[k],
           onAddToArray,
+          onAddToObject,
           onInputChange,
           onInputFocus,
           onRemove
         })
       );
     });
+
+    const addView = generateAddView({
+      types: dropdownOptions,
+      onAdd: (key: string, type: string) => {
+        const newValueId = `${id}-${key}`;
+        if (type === 'array') {
+          label.appendChild(
+            generateAttributeView({ 
+              id: newValueId, 
+              value: [0],
+              onAddToArray,
+              onAddToObject,
+              onInputChange,
+              onInputFocus,
+              onRemove
+            })
+          );
+          onAddToObject(newValueId, [0]);
+        } 
+        else if (type === 'object') {
+          const objValue =  { ['key']: 0 };
+          label.appendChild(
+            generateAttributeView({ 
+              id: newValueId,
+              value: objValue,
+              onAddToArray,
+              onAddToObject,
+              onInputChange,
+              onInputFocus,
+              onRemove
+            })
+          );
+          onAddToObject(newValueId, objValue);
+        } else {
+          const defaultValue = getDefaultValue(type as AttributeType);
+          label.appendChild(
+            generateValueView({
+              id: newValueId,
+              key: `${key}`,
+              value: defaultValue,
+              onChange: onInputChange,
+              onFocus: onInputFocus,
+              onRemove: (el) => {
+                el.parentElement.removeChild(el);
+                onRemove(id);
+              }
+            })
+          );
+          onAddToObject(newValueId, defaultValue);
+        }        
+        label.appendChild(addView);
+      },
+    });    
+    label.appendChild(addView);
   }
   return label;
 };

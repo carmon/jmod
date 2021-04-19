@@ -1,4 +1,4 @@
-import { createButton, createInput, createLabel, createLineBreak } from "../../dom.js";
+import { createButton, createInput, createLabel, createLineBreak } from "../../dom.core.js";
 import { getInputType } from "../values.js";
 
 interface ValueViewProps {

@@ -1,10 +1,4 @@
-
-export type AttributeType = 'string' | 'number' | 'boolean';
-
-export const getDefaultValue = (type: AttributeType): string | number | boolean =>
-  type === "boolean" ? false : type === "string" ? '' : 0;   
-
-// Danger: Mutation
+// Danger: Mutation ops ahead
 export const setProp = (object: Record<string, unknown>, keys: string[], val: unknown): void => {
   if(keys.length > 1){
     object[keys[0]] = object[keys[0]] || {};

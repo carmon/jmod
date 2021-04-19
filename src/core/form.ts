@@ -1,11 +1,17 @@
 import {
   createDropdown,
   createForm,
-} from '../dom.js';
+} from '../dom.core.js';
 import { generateAttributeView } from './views/attribute.js';
 import { generateAddView } from './views/add.js';
-import { getDefaultValue, setProp, AttributeType, deleteProp, getProp } from './object.js';
-import { dropdownOptions, getInputType, getValueType } from './values.js';
+import { setProp, deleteProp, getProp } from './object.js';
+import { 
+  AttributeType,
+  dropdownOptions, 
+  getDefaultValue, 
+  getInputType, 
+  getValueType 
+} from './values.js';
 
 interface CoreProps {
     json: string;
@@ -19,7 +25,7 @@ export default ({
   json,
   setValue,
 }: CoreProps): HTMLFormElement => {
-  let jsonObj = JSON.parse(json);
+  const jsonObj = JSON.parse(json);
   const isArray = Array.isArray(jsonObj); 
   const form = createForm();
 
@@ -50,6 +56,16 @@ export default ({
     setValue(JSON.stringify(jsonObj, null, 2));
   };
 
+  const handleAddToObject = (id: string, value: unknown) => {
+    const keys = id.split('-');
+    if (getProp(jsonObj, keys)) {
+      window.alert('Key exists in object!');
+      return;
+    }
+    setProp(jsonObj, keys, value);
+    setValue(JSON.stringify(jsonObj, null, 2));
+  }
+
   const handleRemoveAttribute = (id: string) => {
     const keys = id.split('-');
 
@@ -75,12 +91,42 @@ export default ({
         id: isArray ? i.toString() : k, 
         value: isArray ? jsonObj[i] : jsonObj[k],
         onAddToArray: handleAddToArray,
+        onAddToObject: handleAddToObject,
         onInputChange: (e) => handleInputChange(e.currentTarget as HTMLInputElement),
         onInputFocus: handleInputFocus,
         onRemove: handleRemoveAttribute,
       })
     );
   });
+
+  const addView = generateAddView({
+    types: dropdownOptions,
+    onAdd: (baseKey: string, type: string) => {
+      const defaultValue = getDefaultValue(type as AttributeType);
+      const targetValue = 
+        type === 'array' 
+          ? [defaultValue] 
+          : type === 'object' 
+            ? { ['key']: defaultValue }
+            : defaultValue;
+
+      handleAddToObject(baseKey, targetValue);
+      form.appendChild(
+        generateAttributeView({
+          id: baseKey, 
+          value: targetValue,
+          onAddToArray: handleAddToArray,
+          onAddToObject: handleAddToObject,
+          onInputChange: (e) => handleInputChange(e.currentTarget as HTMLInputElement),
+          onInputFocus: handleInputFocus,
+          onRemove: handleRemoveAttribute
+        })
+      );
+
+      form.appendChild(addView);
+    },
+  });
+  form.appendChild(addView);
   /////////////////////////////////////////////////////////////////////////////////////////
 
   const onDropdownChange = (e: Event) => {
@@ -103,55 +149,6 @@ export default ({
     currentInput.focus();
   };
 
-  const handleAddAttribute = (baseKey: string, type: string): void => {    
-    const key = isArray ? `${baseKey}-${jsonObj.length}` : baseKey;
-
-    if (jsonObj[key] !== undefined) {
-      window.alert('Key exists in object!');
-      return;
-    }
-
-    const defaultValue = getDefaultValue(type as AttributeType);
-    if (type === 'array') {
-      form.appendChild(
-        generateAttributeView({
-          id: key, 
-          value: [defaultValue],
-          onAddToArray: handleAddToArray,
-          onInputChange: (e) => handleInputChange(e.currentTarget as HTMLInputElement),
-          onInputFocus: handleInputFocus,
-          onRemove: handleRemoveAttribute
-        })
-      );
-
-      jsonObj = isArray ? [...jsonObj, defaultValue] : { ...jsonObj, [key]: [defaultValue] };
-    } else {
-      form.appendChild(
-        generateAttributeView({
-          id: key, 
-          value: defaultValue,
-          onAddToArray: handleAddToArray,
-          onInputChange: (e) => handleInputChange(e.currentTarget as HTMLInputElement),
-          onInputFocus: handleInputFocus,
-          onRemove: handleRemoveAttribute
-        })
-      );
-
-      jsonObj = isArray ? [...jsonObj, defaultValue] : { ...jsonObj, [key]: defaultValue };
-    }
-
-    form.appendChild(addView);
-
-    setValue(JSON.stringify(jsonObj, null, 2));
-  };
-
-  const addView = generateAddView({
-    types: dropdownOptions,
-    onAdd: handleAddAttribute,
-  });
-
-  form.appendChild(addView);
-  
   const dropdown = createDropdown({
     onChange: onDropdownChange,
     options: dropdownOptions
