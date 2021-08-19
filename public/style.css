@@ -7,7 +7,7 @@ body {
     margin-left: .5em;
 }
 
-.core {
+#core {
     display: flex;
     justify-content: space-evenly;
     width: 1080px;
@@ -16,7 +16,7 @@ body {
     margin-left: -540px;
 }
 
-.core pre {
+#core pre {
     background-color: lavender;
     border: 1px solid lightgrey;
     tab-size: 2;
@@ -24,12 +24,12 @@ body {
     width: 500px;
 }
 
-.core form {
+#core form {
     margin-top: 1em;
     width: 500px;
 }
 
-.core form label {
+#core form label {
     color: black;
     display: block;
     font-size: smaller;
@@ -39,24 +39,25 @@ body {
     border: 1px solid;
 }
 
-.core form input, 
-.core form button,
-.core form select {
+#core form input, 
+#core form button,
+#core form select {
     margin: .125em;
 }
 
-.core form .add-btn {
+#core form .add-btn {
     margin: .25em .5em;
 }
 
-.add-view {
+#add {
+    /* display: none !important; */
     margin-top: 1em;
     padding: .5em;
     border: 1px solid;
     width: 240px;
 }
 
-.add-view input,
-.add-view select {
+#add input,
+#add select {
     display: block;
 }

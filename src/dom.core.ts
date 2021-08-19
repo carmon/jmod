@@ -19,13 +19,15 @@ export const createButton = ({ className, id, onclick, text }: ButtonProps): HTM
 interface LabelProps {
   className?: string;
   htmlFor?: string;
+  id?: string;
   text?: string;
 }
 
-export const createLabel = ({ className, htmlFor, text }: LabelProps): HTMLLabelElement => {
+export const createLabel = ({ className, htmlFor, id, text }: LabelProps): HTMLLabelElement => {
   const label = document.createElement('label');
   if (className) label.className = className;
   if (htmlFor) label.htmlFor = htmlFor;
+  label.id = id || '';
   label.style.borderColor = `#${Math.floor(Math.random()*16777215).toString(16)}`;
   label.textContent = text;
   return label;

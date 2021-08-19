@@ -46,6 +46,10 @@ export default ({
     if (currentInput && currentInput.parentElement) {
       currentInput.parentElement.insertBefore(dropdown, currentInput.nextElementSibling);
       dropdown.selectedIndex = dropdownOptions.indexOf(getValueType(currentInput.type));
+      
+      // TODO: get jsonObj element from currentInput.id
+      currentInput.parentElement
+      console.log(currentInput.id);
     }
   }
 
@@ -99,32 +103,35 @@ export default ({
     );
   });
 
+  const onAddToRoot = (baseKey: string, type: string) => {
+    const defaultValue = getDefaultValue(type as AttributeType);
+    const targetValue = 
+      type === 'array' 
+        ? [defaultValue] 
+        : type === 'object' 
+          ? { ['key']: defaultValue }
+          : defaultValue;
+
+    handleAddToObject(baseKey, targetValue);
+    form.appendChild(
+      generateAttributeView({
+        id: baseKey, 
+        value: targetValue,
+        onAddToArray: handleAddToArray,
+        onAddToObject: handleAddToObject,
+        onInputChange: (e) => handleInputChange(e.currentTarget as HTMLInputElement),
+        onInputFocus: handleInputFocus,
+        onRemove: handleRemoveAttribute
+      })
+    );
+
+    form.appendChild(addView);
+  };
+
   const addView = generateAddView({
+    key: 'root',
     types: dropdownOptions,
-    onAdd: (baseKey: string, type: string) => {
-      const defaultValue = getDefaultValue(type as AttributeType);
-      const targetValue = 
-        type === 'array' 
-          ? [defaultValue] 
-          : type === 'object' 
-            ? { ['key']: defaultValue }
-            : defaultValue;
-
-      handleAddToObject(baseKey, targetValue);
-      form.appendChild(
-        generateAttributeView({
-          id: baseKey, 
-          value: targetValue,
-          onAddToArray: handleAddToArray,
-          onAddToObject: handleAddToObject,
-          onInputChange: (e) => handleInputChange(e.currentTarget as HTMLInputElement),
-          onInputFocus: handleInputFocus,
-          onRemove: handleRemoveAttribute
-        })
-      );
-
-      form.appendChild(addView);
-    },
+    onAdd: onAddToRoot,
   });
   form.appendChild(addView);
   /////////////////////////////////////////////////////////////////////////////////////////

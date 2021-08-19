@@ -4,16 +4,18 @@ JMOD: a minimalistic editor for JSON files
 The purpose of this nodejs app is to be a quick JSON -> HTML FORM -> JSON.
 It uses [browser-nativefs](https://github.com/GoogleChromeLabs/browser-nativefs) lib for opening and saving the files.
 
-Some features:
+---
+**CHECK ONLINE**
 
-- Grabs a JSON and render inputs for each variable in pure HTML form
-- Renders a textarea with the preview of the result
-- Filename selector, if none selected save button should be a save-to-file browser form
+[Test online on vercel](https://jmod.vercel.app/)
+---
 
-Current version:
-    
+### Current version:
+
 - Uses browser file loader and file saver for editing JSON data files 
-- Vercel online version [here](https://jmod.vercel.app/)
+- Grabs a JSON or an example if specified on query string
+- Form view: render inputs for each variable in pure HTML form
+- JSON preview: renders a preview of the result
 
 ## Commands
 

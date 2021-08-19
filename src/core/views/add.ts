@@ -1,6 +1,7 @@
 import { createButton, createDropdown, createInput, createLabel } from "../../dom.core.js";
 
 interface AddViewProps {
+  key?: string;
   noKey?: boolean;
   types: string[];
   onAdd: (key: string, type: string) => void;
@@ -12,9 +13,9 @@ const createContainer = (text: string, child: HTMLInputElement | HTMLSelectEleme
   return label;
 };
 
-export const generateAddView = ({ noKey, types, onAdd }: AddViewProps): HTMLLabelElement => {
+export const generateAddView = ({ key, noKey, types, onAdd }: AddViewProps): HTMLLabelElement => {
   const label = createLabel({
-    className: 'add-view',
+    id: 'add',
     text: 'Add' 
   });  
   const formDropdown = createDropdown({
@@ -30,7 +31,7 @@ export const generateAddView = ({ noKey, types, onAdd }: AddViewProps): HTMLLabe
   } else {
     let keyIt = 0;
     const formInput = createInput({
-      id: 'formInput',
+      id: `${key}-input`,
       type: 'text',
       value: `key${keyIt}`
     });

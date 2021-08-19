@@ -86,57 +86,60 @@ export const generateAttributeView = ({
         }));
     });
 
+    const onViewAddToArray = (_: string, type: string) => {
+      // Array length: label childs len - this view
+      const valuesLen = label.children.length - 1;
+      const key = valuesLen.toString();
+      const newValueId = `${id}-${key}`;
+      if (type === 'array') {
+        label.appendChild(
+          generateAttributeView({ 
+            id: newValueId, 
+            value: [0],
+            onAddToArray,
+            onAddToObject,
+            onInputChange,
+            onInputFocus,
+            onRemove
+          })
+        );
+        onAddToArray(id, [0]);
+      } 
+      else if (type === 'object') {
+        label.appendChild(
+          generateAttributeView({ 
+            id: newValueId, 
+            value: { 'key': 0 },
+            onAddToArray,
+            onAddToObject,
+            onInputChange,
+            onInputFocus,
+            onRemove
+          })
+        );
+        onAddToArray(id, { 'key': 0 });
+      } else {
+        const defaultValue = getDefaultValue(type as AttributeType);
+        label.appendChild(
+          generateValueView({
+            id: newValueId,
+            key: `${key}`,
+            value: defaultValue,
+            onChange: onInputChange,
+            onFocus: onInputFocus,
+            onRemove: getRemoveFromArray(newValueId, value.length)
+          })
+        );
+        onAddToArray(id, defaultValue);
+      }        
+      label.appendChild(addView);
+    };
+
     const addView = generateAddView({
+      key,
       noKey: true,
       types: dropdownOptions,
-      onAdd: (_: string, type: string) => {
-        // Array length: label childs len - this view
-        const valuesLen = label.children.length - 1;
-        const key = valuesLen.toString();
-        const newValueId = `${id}-${key}`;
-        if (type === 'array') {
-          label.appendChild(
-            generateAttributeView({ 
-              id: newValueId, 
-              value: [0],
-              onAddToArray,
-              onAddToObject,
-              onInputChange,
-              onInputFocus,
-              onRemove
-            })
-          );
-          onAddToArray(id, [0]);
-        } 
-        else if (type === 'object') {
-          label.appendChild(
-            generateAttributeView({ 
-              id: newValueId, 
-              value: { 'key': 0 },
-              onAddToArray,
-              onAddToObject,
-              onInputChange,
-              onInputFocus,
-              onRemove
-            })
-          );
-          onAddToArray(id, { 'key': 0 });
-        } else {
-          const defaultValue = getDefaultValue(type as AttributeType);
-          label.appendChild(
-            generateValueView({
-              id: newValueId,
-              key: `${key}`,
-              value: defaultValue,
-              onChange: onInputChange,
-              onFocus: onInputFocus,
-              onRemove: getRemoveFromArray(newValueId, value.length)
-            })
-          );
-          onAddToArray(id, defaultValue);
-        }        
-        label.appendChild(addView);
-      },
+      onAdd: onViewAddToArray,
     });    
     label.appendChild(addView);
   } 
@@ -155,57 +158,60 @@ export const generateAttributeView = ({
       );
     });
 
+    const onViewAddToObject = (key: string, type: string) => {
+      const newValueId = `${id}-${key}`;
+      if (type === 'array') {
+        label.appendChild(
+          generateAttributeView({ 
+            id: newValueId, 
+            value: [0],
+            onAddToArray,
+            onAddToObject,
+            onInputChange,
+            onInputFocus,
+            onRemove
+          })
+        );
+        onAddToObject(newValueId, [0]);
+      } 
+      else if (type === 'object') {
+        const objValue =  { ['key']: 0 };
+        label.appendChild(
+          generateAttributeView({ 
+            id: newValueId,
+            value: objValue,
+            onAddToArray,
+            onAddToObject,
+            onInputChange,
+            onInputFocus,
+            onRemove
+          })
+        );
+        onAddToObject(newValueId, objValue);
+      } else {
+        const defaultValue = getDefaultValue(type as AttributeType);
+        label.appendChild(
+          generateValueView({
+            id: newValueId,
+            key: `${key}`,
+            value: defaultValue,
+            onChange: onInputChange,
+            onFocus: onInputFocus,
+            onRemove: (el) => {
+              el.parentElement.removeChild(el);
+              onRemove(id);
+            }
+          })
+        );
+        onAddToObject(newValueId, defaultValue);
+      }        
+      label.appendChild(addView);
+    };
+
     const addView = generateAddView({
+      key,
       types: dropdownOptions,
-      onAdd: (key: string, type: string) => {
-        const newValueId = `${id}-${key}`;
-        if (type === 'array') {
-          label.appendChild(
-            generateAttributeView({ 
-              id: newValueId, 
-              value: [0],
-              onAddToArray,
-              onAddToObject,
-              onInputChange,
-              onInputFocus,
-              onRemove
-            })
-          );
-          onAddToObject(newValueId, [0]);
-        } 
-        else if (type === 'object') {
-          const objValue =  { ['key']: 0 };
-          label.appendChild(
-            generateAttributeView({ 
-              id: newValueId,
-              value: objValue,
-              onAddToArray,
-              onAddToObject,
-              onInputChange,
-              onInputFocus,
-              onRemove
-            })
-          );
-          onAddToObject(newValueId, objValue);
-        } else {
-          const defaultValue = getDefaultValue(type as AttributeType);
-          label.appendChild(
-            generateValueView({
-              id: newValueId,
-              key: `${key}`,
-              value: defaultValue,
-              onChange: onInputChange,
-              onFocus: onInputFocus,
-              onRemove: (el) => {
-                el.parentElement.removeChild(el);
-                onRemove(id);
-              }
-            })
-          );
-          onAddToObject(newValueId, defaultValue);
-        }        
-        label.appendChild(addView);
-      },
+      onAdd: onViewAddToObject,
     });    
     label.appendChild(addView);
   }
