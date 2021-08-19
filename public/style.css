@@ -16,11 +16,12 @@ body {
     margin-left: -540px;
 }
 
-.core textarea {
-    display: block;
-    resize: none;
+.core pre {
+    background-color: lavender;
+    border: 1px solid lightgrey;
+    tab-size: 2;
+    text-align: left;
     width: 500px;
-    height: 95%;
 }
 
 .core form {

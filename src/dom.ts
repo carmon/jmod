@@ -41,16 +41,14 @@ export const createInput = ({ disabled, id, onChange, onFocus, type, value }: In
   return input;
 };
 
-interface TextAreaProps {
+interface PreviewProps {
   content: string;
   id?: string;
 }
 
-export const createTextArea = ({ content, id }: TextAreaProps): HTMLTextAreaElement => {
-  const textArea = document.createElement('textarea');
-  textArea.value = content;
-  textArea.id = id || '';
-  textArea.disabled = true;
-  textArea.readOnly = true;
-  return textArea;
-}
+export const createPreview = ({ content, id }: PreviewProps): HTMLPreElement => {
+  const pre = document.createElement('pre');
+  pre.id = id || null;
+  pre.textContent = content;
+  return pre;
+};

@@ -1,6 +1,4 @@
-import {
-  createTextArea,
-} from './dom.js';
+import { createPreview } from './dom.js';
 import { getSearchWord } from './window.js';
 import { saveToJSON } from './nativefs.js';
 
@@ -11,16 +9,17 @@ import loadExample from './load.js';
 
 if (window.isSecureContext) {  
   let form: HTMLFormElement | null = null;
-  let preview: HTMLTextAreaElement | null = null;
+  let preview: HTMLPreElement | null = null;
   
   const formParent = document.getElementById("formParent");
   const previewParent = document.getElementById("previewParent");
   if (formParent && previewParent) {
-    const start = (json: string) => {  
-      preview = createTextArea({ content: json, id: 'Preview'});
-      const setValue = (value: string): void => {
-        if (preview)
-          preview.value = value;
+    const start = (json: string) => {
+      preview = createPreview({ content: json, id: 'preview' });
+      const setValue = (value: string): void => {        
+        if (preview) {
+          preview.textContent = value;
+        }   
       }
       previewParent.appendChild(preview);
   
@@ -49,7 +48,7 @@ if (window.isSecureContext) {
     const onSaveJSONClick = async (ev: MouseEvent) => {
       if (!preview) return;
       ev.preventDefault();
-      await saveToJSON(preview.value, filename);
+      await saveToJSON(preview.textContent, filename);
     };
   
     const fileInputParent = document.getElementById("file-input");

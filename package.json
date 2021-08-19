@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "JSON minimal editor",
     "scripts": {
-        "build": "./node_modules/.bin/tsc --project tsconfig.json",
+        "build": "tsc --project tsconfig.json",
         "clean": "rm -rf ./public/dist",
         "lint": "eslint",
         "start": "npx http-server ./public"
