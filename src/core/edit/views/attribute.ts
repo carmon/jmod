@@ -1,9 +1,9 @@
-import { createLabel } from "../../dom.core.js";
+import { createLabel } from "../../../dom.core.js";
 import { 
   AttributeType,
   dropdownOptions, 
   getDefaultValue
-} from "../values.js";
+} from "../../values.js";
 import { generateAddView } from "./add.js";
 import { generateValueView } from "./value.js";
 

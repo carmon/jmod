@@ -10,10 +10,7 @@ body {
 #core {
     display: flex;
     justify-content: space-evenly;
-    width: 1080px;
-    left: 50%;
     position: relative;
-    margin-left: -540px;
 }
 
 #core pre {
@@ -26,7 +23,11 @@ body {
 
 #core form {
     margin-top: 1em;
-    width: 500px;
+    width: 350px;
+}
+
+#core pre {
+    width: 350px;
 }
 
 #core form label {

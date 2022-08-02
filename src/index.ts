@@ -4,23 +4,41 @@ import { getSearchWord } from './window.js';
 import { saveToJSON } from './nativefs.js';
 
 import createFileInput from './file-input.js';
-import createForm from './core/form.js';
+import createForm from './core/result/form.js';
+import createEditForm from './core/edit/edit-form.js';
 
 import loadExample from './load.js';
 
 if (window.isSecureContext) {  
   let form: HTMLFormElement | null = null;
   let preview: HTMLPreElement | null = null;
+  let editForm: HTMLFormElement | null = null;
+  let submitPreview: HTMLPreElement | null = null;
   
   const core = document.getElementById('core');
   
-  const formParent = createView({ title: 'Form' });
+  const editformParent = createView({ title: 'Edit JSON' });
   const previewParent = createView({ title: 'JSON Preview' });
+  const formParent = createView({ title: 'Form Result' });
+  const submitParent = createView({ title: 'Submitted JSON' });
 
-  core.appendChild(formParent);
+  core.appendChild(editformParent);
   core.appendChild(previewParent);
+  core.appendChild(formParent);
+  core.appendChild(submitParent);
 
   const start = (json: string) => {
+    submitPreview = createPreview({ content: '', id: 'submitted' });
+    const submitValue = (value: string): void => {        
+      if (submitPreview) {
+        submitPreview.textContent = value;
+      }   
+    }
+    submitParent.appendChild(submitPreview)
+
+    form = createForm({ json, submitValue });
+    formParent.appendChild(form);
+
     preview = createPreview({ content: json, id: 'preview' });
     const setValue = (value: string): void => {        
       if (preview) {
@@ -29,19 +47,29 @@ if (window.isSecureContext) {
     }
     previewParent.appendChild(preview);
 
-    form = createForm({ json, setValue });
-    formParent.appendChild(form);
+    editForm = createEditForm({ json, setValue });
+    editformParent.appendChild(editForm);
   };
 
   const clean = () => {
-    if (preview) {
-      previewParent.removeChild(preview);
-      preview = null;
+    if (submitPreview) {
+      submitParent.removeChild(submitPreview);
+      submitPreview = null;
     }
 
     if (form) {
       formParent.removeChild(form);
       form = null;
+    }
+
+    if (preview) {
+      previewParent.removeChild(preview);
+      preview = null;
+    }
+
+    if (editForm) {
+      editformParent.removeChild(editForm);
+      editForm = null;
     }
   };
   

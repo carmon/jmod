@@ -35,14 +35,22 @@ export const createLabel = ({ className, htmlFor, id, text }: LabelProps): HTMLL
 
 export const createLineBreak = (): HTMLBRElement => document.createElement('br');
 
-export const createForm = (): HTMLFormElement => document.createElement('form');
+interface FormProps {
+  onSubmit?: (e: Event) => void;
+}
+
+export const createForm = ({ onSubmit }: FormProps): HTMLFormElement => {
+  const form = document.createElement('form');
+  form.onsubmit = onSubmit;
+  return form;
+}
 
 interface InputProps {
   disabled?: boolean;
   id: string;
   onChange?: (e: Event) => void;
   onFocus?: (e: Event) => void; 
-  type: 'text' | 'number' | 'checkbox';
+  type: 'text' | 'number' | 'checkbox' | 'submit';
   value: boolean | string;
 }
 

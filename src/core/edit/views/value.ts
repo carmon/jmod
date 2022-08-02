@@ -1,11 +1,12 @@
-import { createButton, createInput, createLabel, createLineBreak } from "../../dom.core.js";
-import { getInputType } from "../values.js";
+import { createButton, createInput, createLabel, createLineBreak } from "../../../dom.core.js";
+import { getInputType } from "../../values.js";
 
+export type FormValue = string | boolean | null | number;
 interface ValueViewProps {
   id?: string;
   key?: string;
   lineBreak?: boolean;
-  value: string | boolean | null | number;
+  value: FormValue;
   onChange?: (e: Event) => void;
   onFocus?: (e: Event) => void;
   onRemove: (view: HTMLLabelElement) => void;

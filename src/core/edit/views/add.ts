@@ -1,4 +1,4 @@
-import { createButton, createDropdown, createInput, createLabel } from "../../dom.core.js";
+import { createButton, createDropdown, createInput, createLabel } from "../../../dom.core.js";
 
 interface AddViewProps {
   key?: string;

@@ -1,17 +1,17 @@
 import {
   createDropdown,
   createForm,
-} from '../dom.core.js';
+} from '../../dom.core.js';
 import { generateAttributeView } from './views/attribute.js';
 import { generateAddView } from './views/add.js';
-import { setProp, deleteProp, getProp } from './object.js';
+import { setProp, deleteProp, getProp } from '../object.js';
 import { 
   AttributeType,
   dropdownOptions, 
   getDefaultValue, 
   getInputType, 
   getValueType 
-} from './values.js';
+} from '../values.js';
 
 interface CoreProps {
     json: string;
@@ -25,9 +25,9 @@ export default ({
   json,
   setValue,
 }: CoreProps): HTMLFormElement => {
-  const jsonObj = JSON.parse(json);
+  const jsonObj: Record<string, unknown> = JSON.parse(json);
   const isArray = Array.isArray(jsonObj); 
-  const form = createForm();
+  const form = createForm({});
 
   const handleInputChange = (input: HTMLInputElement) => {  
     const { id } = input;
@@ -76,7 +76,7 @@ export default ({
     if (isArray) {
       if (keys.length > 1) {
         const [first, ...rest] = keys;
-        deleteProp(jsonObj[first], rest);
+        deleteProp(jsonObj[first] as Record<string, unknown>, rest);
       }
       else {
         deleteProp(jsonObj, keys);
@@ -88,7 +88,7 @@ export default ({
   };
 
   // Create form with JSON attributes /////////////////////////////////////////////////////
-  const keys = isArray ? jsonObj : Object.keys(jsonObj);
+  const keys = isArray ? jsonObj as unknown as string[] : Object.keys(jsonObj);
   keys.forEach((k: string, i: number) => {
     form.appendChild(
       generateAttributeView({
