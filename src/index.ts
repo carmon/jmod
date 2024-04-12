@@ -1,5 +1,5 @@
 import { createPreview } from './dom.js';
-import { createView } from './dom.views.js';
+import { createView, createError } from './dom.views.js';
 import { getSearchWord } from './window.js';
 import { saveToJSON } from './nativefs.js';
 
@@ -9,13 +9,13 @@ import createEditForm from './core/edit/edit-form.js';
 
 import loadExample from './load.js';
 
+const core = document.getElementById('core');
+
 if (window.isSecureContext) {  
   let form: HTMLFormElement | null = null;
   let preview: HTMLPreElement | null = null;
   let editForm: HTMLFormElement | null = null;
-  let submitPreview: HTMLPreElement | null = null;
-  
-  const core = document.getElementById('core');
+  let submitPreview: HTMLPreElement | null = null;  
   
   const editformParent = createView({ title: 'Edit JSON' });
   const previewParent = createView({ title: 'JSON Preview' });
@@ -102,7 +102,8 @@ if (window.isSecureContext) {
       start(example);
     });  
 } else {
-  window.alert('window.isSecureContext is false!');
+  const error = createError({ error: 'window.isSecureContext is false!' })
+  core.append(error);
 }
 
 console.log('Compiled JS loaded!');
