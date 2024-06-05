@@ -17,10 +17,10 @@ if (window.isSecureContext) {
   let editForm: HTMLFormElement | null = null;
   let submitPreview: HTMLPreElement | null = null;  
   
-  const editformParent = createView({ title: 'Edit JSON' });
-  const previewParent = createView({ title: 'JSON Preview' });
-  const formParent = createView({ title: 'Form Result' });
-  const submitParent = createView({ title: 'Submitted JSON' });
+  const editformParent = createView({ id: 'edit', title: 'Edit JSON' });
+  const previewParent = createView({ id: 'preview', title: 'JSON Preview' });
+  const formParent = createView({ id: 'result', title: 'Form Result' });
+  const submitParent = createView({ id: 'payload', title: 'Submitted JSON' });
 
   core.appendChild(editformParent);
   core.appendChild(previewParent);

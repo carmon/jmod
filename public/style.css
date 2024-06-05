@@ -1,5 +1,6 @@
 body {
     text-align: center;
+    --column-width: 300px;
 }
 
 #file-input button:not(:first-child), 
@@ -18,16 +19,15 @@ body {
     border: 1px solid lightgrey;
     tab-size: 2;
     text-align: left;
-    width: 500px;
 }
 
 #core form {
     margin-top: 1em;
-    width: 350px;
+    width: var(--column-width);
 }
 
 #core pre {
-    width: 350px;
+    width: var(--column-width);
 }
 
 #core form label {
