@@ -1,6 +1,6 @@
 body {
     text-align: center;
-    --column-width: 300px;
+    --column-width: 270px;
 }
 
 #file-input button:not(:first-child), 

@@ -21,3 +21,7 @@ It uses [browser-nativefs](https://github.com/GoogleChromeLabs/browser-nativefs)
 
 - **npm run build** to build TS to JS
 - **npm start** to run a http-server with JSON editor
+
+## TODO
+
+- watcher
